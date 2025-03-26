@@ -106,7 +106,6 @@ We welcome contributions to EcoSphere! Please submit pull requests or report iss
 
 ---
 
-## 📧 **Contact**  
-For any questions or feedback, reach out at **support@ecosphere.org**.  
+
 
 Let’s make disaster response more effective, together. 🌎
