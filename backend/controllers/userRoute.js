@@ -9,11 +9,8 @@ const port=process.env.PORT
 
 
 userRoute.post("/login", async (req, res) => {
-  console.log(req.body);
-
   try {
     const { email, password } = req.body;
-
     if (email && password) {
       let newuser = new volenteerSchema({ email, password });
       await newuser.save();
@@ -25,6 +22,7 @@ userRoute.post("/login", async (req, res) => {
     res.status(500).send({ message: "internal server error",error });
     console.log(error)
   }
+  console.log(req.body)
 });
 
 
