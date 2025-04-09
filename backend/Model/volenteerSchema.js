@@ -58,6 +58,6 @@ const VolenteerSchema =new mongoose.Schema({
 })
 
 
-const volenteerSchema =mongoose.model("volenteer",VolenteerSchema)
+const volenteerModel =mongoose.model("volenteer",VolenteerSchema)
 
-module.exports={volenteerSchema}
+module.exports={volenteerModel}
