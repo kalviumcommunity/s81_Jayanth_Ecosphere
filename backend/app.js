@@ -1,4 +1,5 @@
 const express=require("express")
+const middleware=require("./middleware/error")
 const app = express();
 app.use(express.json());
 
@@ -9,7 +10,12 @@ app.get("/test", async (req, res) => {
   });
 
 
-  app.use("/user",userRoute)
+  app.use("/user",userRoute);
+
+
+
+
+  app.use(middleware)
 
 
   module.exports = { app };  
