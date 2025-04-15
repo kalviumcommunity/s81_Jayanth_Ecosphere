@@ -82,8 +82,6 @@ userRoute.post("/signup", catchAsyncError(async(req,res,next)=>{
 
 
 userRoute.get("/activation/:token",catchAsyncError(async(req,res,next)=>{
-
-
   let token = req.params.token
   if (!token) {
     return next(new Errorhandler("token not found 🥺", 404))
@@ -92,13 +90,16 @@ userRoute.get("/activation/:token",catchAsyncError(async(req,res,next)=>{
     if (err) {
       return next(new Errorhandler("token is not valid ❌", 400))
     }
-
     let id = decoded.id
     await volenteerModel.findByIdAndUpdate(id, { isActivated: true })
 
+    
     // res.redirect("http://localhost:5173/login")
 
+
     res.status(200).json({ status: true, message: "activation is completed 🤞" })
+
+
 
   });
 
@@ -156,6 +157,29 @@ userRoute.post("/login", catchAsyncError(async (req, res , next) => {
   }
   console.log(req.body)
 }));
+
+
+
+
+
+
+userRoute.get("/logout", catchAsyncError(async (req, res, next) => {
+  try {
+    res.clearCookie("accesstoken", {
+      httpOnly: true,
+      secure: false, 
+      sameSite: "lax"
+    });
+
+    res.status(200).json({
+      status: true,
+      message: "Logout successful 👋"
+    });
+  } catch (error) {
+    next(new Errorhandler("Logout failed ❌", 500));
+  }
+}));
+
 
 
 
