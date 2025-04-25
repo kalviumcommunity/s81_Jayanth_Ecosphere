@@ -1,5 +1,5 @@
 const express = require("express");
-const { volenteerModel } = require("../Model/volenteerSchema");
+const { volunteerModel } = require("../Model/volenteerSchema");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { sendMail } = require("../utils/mail");
@@ -23,16 +23,16 @@ userRoute.post("/signup", catchAsyncError(async (req, res, next) => {
     return next(new Errorhandler("Name, email and password required ❌", 400));
   }
 
-  const existingUser = await volenteerModel.findOne({ email });
+  const existingUser = await volunteerModel.findOne({ email });
   if (existingUser) {
     return next(new Errorhandler("User already exists 😵‍💫", 409));
   }
 
   const hashedPassword = await bcrypt.hash(password, 7);
-  const newUser = new volenteerModel({ name, email, password: hashedPassword });
+  const newUser = new volunteerModel({ name, email, password: hashedPassword });
 
-  if (role === "volenteer") {
-    newUser.role = "volenteer";
+  if (role === "volunteer") {
+    newUser.role = "volunteer";
     newUser.address = address;
   }
 
@@ -65,7 +65,7 @@ userRoute.get("/activation/:token", catchAsyncError(async (req, res, next) => {
   jwt.verify(token, process.env.SECRET, async (err, decoded) => {
     if (err) return next(new Errorhandler("Invalid token ❌", 400));
 
-    await volenteerModel.findByIdAndUpdate(decoded.id, { isActivated: true });
+    await volunteerModel.findByIdAndUpdate(decoded.id, { isActivated: true });
     res.status(200).json({ status: true, message: "Activation completed 🤞" });
   });
 }));
@@ -84,7 +84,7 @@ userRoute.post("/login", catchAsyncError(async (req, res, next) => {
     return next(new Errorhandler("Email and password are required ❌", 400));
   }
 
-  const user = await volenteerModel.findOne({ email });
+  const user = await volunteerModel.findOne({ email });
   if (!user) {
     return next(new Errorhandler("Please signup 🥺", 400));
   }
@@ -125,7 +125,7 @@ userRoute.get("/checklogin", auth, catchAsyncError(async (req, res, next) => {
   
   try {
     
-    const user = await volenteerModel.findById(userId).select("name email role address profilePhoto");
+    const user = await volunteerModel.findById(userId).select("name email role address profilePhoto");
     console.log(user)
     if (!user) {
      
@@ -156,7 +156,7 @@ userRoute.put("/add-address", auth, authorization, catchAsyncError(async (req, r
     return next(new Errorhandler("All address fields are required", 400));
   }
 
-  const updatedUser = await volenteerModel.findByIdAndUpdate(
+  const updatedUser = await volunteerModel.findByIdAndUpdate(
     userId,
     { $push: { address: req.body } },
     { new: true }
@@ -188,11 +188,6 @@ userRoute.get("/logout", catchAsyncError(async (req, res, next) => {
 
 
 
-userRoute.get("/volenteer-only", auth, authorization, catchAsyncError(async (req, res, next) => {
-  const userId = req.user_id;
-  const user = await volenteerModel.findById(userId).select("name email role");
 
-  res.status(200).json({ status: true, message: `Welcome, ${user.name}! You have volenteer access.` });
-}));
 
 module.exports = { userRoute };

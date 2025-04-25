@@ -8,6 +8,7 @@ function Signup() {
   const [hide, setHide] = useState(true);
   const [hided, setHided] = useState(true);
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false); 
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -40,23 +41,27 @@ function Signup() {
 
   const handleSubmit = async () => {
     setErr("");
+    setLoading(true);
     const { name, email, password, confirmpass, role, address } = data;
 
     if (!name.trim() || !email.trim() || !password || !confirmpass || !role) {
       setErr("Please fill all fields");
+      setLoading(false);
       return;
     }
 
     if (
-      role === "volenteer" &&
+      role === "volunteer" &&
       (!address.country || !address.city || !address.address || !address.pincode)
     ) {
       setErr("Please fill all address fields for volunteer role");
+      setLoading(false);
       return;
     }
 
     if (password !== confirmpass) {
       setErr("Passwords do not match");
+      setLoading(false);
       return;
     }
 
@@ -66,14 +71,20 @@ function Signup() {
         email: email.trim(),
         password,
         role,
-        ...(role === "volenteer" && { address }),
+        ...(role === "volunteer" && { address }),
       };
 
       await axios.post("http://localhost:4567/user/signup", payload);
-      navigate("/Login");
+
+      
+      setTimeout(() => {
+        navigate("/Login");
+      }, 1000);
     } catch (error) {
       console.error(error);
       setErr(error.response?.data?.message || "Signup failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -105,10 +116,7 @@ function Signup() {
           Create an Account
         </motion.h1>
 
-        {[
-          { label: "Name", name: "name", type: "text" },
-          { label: "Email Address", name: "email", type: "email" },
-        ].map((field, i) => (
+        {[{ label: "Name", name: "name", type: "text" }, { label: "Email Address", name: "email", type: "email" }].map((field, i) => (
           <motion.div key={field.name} custom={i} variants={fadeIn}>
             <label className="block text-sm font-medium">{field.label}</label>
             <input
@@ -130,27 +138,25 @@ function Signup() {
             className="w-full px-4 py-2 mb-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="user">User</option>
-            <option value="volenteer">Volunteer</option>
+            <option value="volunteer">Volunteer</option>
           </select>
         </motion.div>
 
-        {data.role === "volenteer" &&
-          ["country", "city", "address", "pincode", "area", "addressType"].map(
-            (field, i) => (
-              <motion.div key={field} custom={i + 2} variants={fadeIn}>
-                <label className="block text-sm font-medium capitalize">
-                  {field.replace(/([A-Z])/g, " $1")}
-                </label>
-                <input
-                  type="text"
-                  name={field}
-                  value={data.address[field]}
-                  onChange={handleAddressChange}
-                  className="w-full px-4 py-2 mb-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </motion.div>
-            )
-          )}
+        {data.role === "volunteer" &&
+          ["country", "city", "address", "pincode", "area", "addressType"].map((field, i) => (
+            <motion.div key={field} custom={i + 2} variants={fadeIn}>
+              <label className="block text-sm font-medium capitalize">
+                {field.replace(/([A-Z])/g, " $1")}
+              </label>
+              <input
+                type="text"
+                name={field}
+                value={data.address[field]}
+                onChange={handleAddressChange}
+                className="w-full px-4 py-2 mb-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </motion.div>
+          ))}
 
         <motion.div variants={fadeIn}>
           <label className="block text-sm font-medium">Password</label>
@@ -201,18 +207,16 @@ function Signup() {
         )}
 
         <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-md transition duration-300"
+          whileHover={!loading && { scale: 1.05 }}
+          whileTap={!loading && { scale: 0.95 }}
+          disabled={loading}
+          className={`w-full ${loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"} text-white font-medium py-2 rounded-md transition duration-300`}
           onClick={handleSubmit}
         >
-          Signup
+          {loading ? "Signing up..." : "Signup"}
         </motion.button>
 
-        <motion.p
-          variants={fadeIn}
-          className="mt-4 text-sm text-center"
-        >
+        <motion.p variants={fadeIn} className="mt-4 text-sm text-center">
           Already have an account?{" "}
           <span
             className="text-blue-500 hover:underline cursor-pointer"

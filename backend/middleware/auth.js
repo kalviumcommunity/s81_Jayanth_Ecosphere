@@ -29,7 +29,7 @@ const authorization = (req, res, next) => {
             return res.status(401).json({ message: "Invalid or expired token" });
         }
 
-        if (decoded.role === "volenteer") {
+        if (decoded.role === "volunteer") {
             req.user_id = decoded.id;
             next();
         } else {

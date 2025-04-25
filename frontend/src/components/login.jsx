@@ -10,6 +10,7 @@ function Login() {
   const [error, setError] = useState("");
   const [data, setData] = useState({ email: "", password: "" });
   const [isLogin, setIsLogin] = useState(false);
+  const [loading, setLoading] = useState(false); 
 
   const handleHide = () => setHide(!hide);
 
@@ -23,6 +24,7 @@ function Login() {
       setError("Please fill all fields");
       return;
     }
+    setLoading(true);
 
     try {
       const response = await axios.post(
@@ -116,12 +118,13 @@ function Login() {
         </div>
 
         <motion.button
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
+          whileHover={!loading && { scale: 1.05 }}
+          whileTap={!loading && { scale: 0.95 }}
+          disabled={loading} 
+          className={`w-full ${loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"} text-white font-medium py-2 rounded-md transition duration-300`}
           onClick={handleSubmit}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-md transition duration-300"
         >
-          Login
+          {loading ? "Logging in..." : "Login"} 
         </motion.button>
 
         <div className="text-center text-sm mt-4">

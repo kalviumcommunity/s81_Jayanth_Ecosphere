@@ -87,17 +87,6 @@ const Navbarpage = () => {
         </motion.h1>
 
         <div className="space-x-6 flex items-center">
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              isActive
-                ? "text-blue-600 font-semibold"
-                : "text-gray-700 dark:text-gray-200 hover:text-blue-500 transition duration-300"
-            }
-          >
-            Home
-          </NavLink>
-
           {isLoggedIn ? (
             <div className="relative" ref={sidebarRef}>
               <motion.div
@@ -122,21 +111,32 @@ const Navbarpage = () => {
                     className="absolute right-0 mt-4.5 bg-white dark:bg-gray-700 rounded-xl shadow-xl p-5 w-52 z-10"
                   >
                     <ul className="space-y-2">
-                      {userRole == "volenteer" && (
+                      <NavLink
+                        to="/"
+                        className={({ isActive }) =>
+                          isActive
+                            ? "text-blue-600 font-semibold block hover:text-blue-500 transition duration-300"
+                            : "text-gray-700 dark:text-gray-200 hover:text-blue-500 block transition duration-300"
+                        }
+                      >
+                        Home
+                      </NavLink>
+
+                      {userRole == "volunteer" && (
                         <motion.li
                           whileHover={{ x: 5 }}
-                          className="text-gray-700 dark:text-gray-200 hover:text-blue-500 cursor-pointer transition"
+                          className="text-gray-700 dark:text-gray-200 hover:text-blue-500 cursor-pointer transition block"
                           onClick={() => navigate("/profile")}
                         >
                           Profile
                         </motion.li>
                       )}
 
-                      {userRole == "volenteer" && (
+                      {userRole == "volunteer" && (
                         <motion.li
                           whileHover={{ x: 5 }}
-                          className="text-gray-700 dark:text-gray-200 hover:text-blue-500 cursor-pointer transition"
-                          onClick={() => navigate("/volenteer")}
+                          className="text-gray-700 dark:text-gray-200 hover:text-blue-500 cursor-pointer transition block"
+                          onClick={() => navigate("/volunteer")}
                         >
                           Volunteer
                         </motion.li>
@@ -144,7 +144,15 @@ const Navbarpage = () => {
 
                       <motion.li
                         whileHover={{ x: 5 }}
-                        className="text-gray-700 dark:text-gray-200 hover:text-blue-500 cursor-pointer transition"
+                        className="text-gray-700 dark:text-gray-200 hover:text-blue-500 cursor-pointer transition block"
+                        onClick={() => navigate("/data")}
+                      >
+                        Data
+                      </motion.li>
+
+                      <motion.li
+                        whileHover={{ x: 5 }}
+                        className="text-gray-700 dark:text-gray-200 hover:text-blue-500 cursor-pointer transition block"
                         onClick={() => navigate("/chat")}
                       >
                         Chat
@@ -152,15 +160,16 @@ const Navbarpage = () => {
 
                       <motion.li
                         whileHover={{ x: 5 }}
-                        className="text-gray-700 dark:text-gray-200 hover:text-blue-500 cursor-pointer transition"
+                        className="text-gray-700 dark:text-gray-200 hover:text-blue-500 cursor-pointer transition block"
                         onClick={() => navigate("/settings")}
                       >
                         Settings
                       </motion.li>
+
                       <motion.li
                         onClick={handleLogout}
                         whileHover={{ scale: 1.05 }}
-                        className="text-red-600 hover:text-red-700 cursor-pointer pt-2 border-t border-gray-200 dark:border-gray-600"
+                        className="text-red-600 hover:text-red-700 cursor-pointer pt-2 border-t border-gray-200 dark:border-gray-600 block"
                       >
                         Logout
                       </motion.li>
@@ -170,16 +179,28 @@ const Navbarpage = () => {
               </AnimatePresence>
             </div>
           ) : (
-            <NavLink
-              to="/login"
-              className={({ isActive }) =>
-                isActive
-                  ? "text-blue-600 font-semibold"
-                  : "text-gray-700 dark:text-gray-200 hover:text-blue-500 transition duration-300"
-              }
-            >
-              Login
-            </NavLink>
+            <>
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-blue-600 font-semibold"
+                    : "text-gray-700 dark:text-gray-200 hover:text-blue-500 transition duration-300"
+                }
+              >
+                Home
+              </NavLink>
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-blue-600 font-semibold"
+                    : "text-gray-700 dark:text-gray-200 hover:text-blue-500 transition duration-300"
+                }
+              >
+                Login
+              </NavLink>
+            </>
           )}
         </div>
       </div>
