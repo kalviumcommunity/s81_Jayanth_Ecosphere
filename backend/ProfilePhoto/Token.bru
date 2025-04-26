@@ -1,0 +1,18 @@
+meta {
+  name: Token
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:4567/user/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email":"kolleparajayanth@gmail.com",
+    "password":"123"
+  }
+}

@@ -48,8 +48,9 @@ const VolunteerSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-
-  // Added fields below
+   profilePhoto: {
+     type: String 
+    },
   tasks: [
     {
       title: String,

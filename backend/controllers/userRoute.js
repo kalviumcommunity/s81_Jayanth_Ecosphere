@@ -5,7 +5,10 @@ const jwt = require("jsonwebtoken");
 const { sendMail } = require("../utils/mail");
 const Errorhandler = require("../utils/Errorhandler");
 const catchAsyncError = require("../middleware/catchAsyncError");
-const { auth, authorization } = require("../middleware/auth");
+const { auth, authorization } = require("../middleware/auth")
+const { upload } = require("../middleware/multer");
+const path = require("path");
+
 
 require("dotenv").config();
 
@@ -116,29 +119,41 @@ userRoute.post("/login", catchAsyncError(async (req, res, next) => {
 
 
 
-userRoute.get("/checklogin", auth, catchAsyncError(async (req, res, next) => {
+// userRoute.get("/checklogin", auth, catchAsyncError(async (req, res, next) => {
   
-  const userId = req.user_id; 
-  if (!userId) {
-    return res.status(401).json({ status: false, message: "Not authorized" });
-  }
+//   const userId = req.user_id; 
+//   if (!userId) {
+//     return res.status(401).json({ status: false, message: "Not authorized" });
+//   }
   
-  try {
+//   try {
     
-    const user = await volunteerModel.findById(userId).select("name email role address profilePhoto");
-    console.log(user)
-    if (!user) {
+//     const user = await volunteerModel.findById(userId).select("name email role address profilePhoto");
+//     console.log(user)
+//     if (!user) {
      
-      return res.status(404).json({ status: false, message: "User not found" });
-    }
+//       return res.status(404).json({ status: false, message: "User not found" });
+//     }
 
     
-    res.status(200).json({ status: true, message: user });
-  } catch (error) {
+//     res.status(200).json({ status: true, message: user });
+//   } catch (error) {
     
-    console.error("Error fetching user:", error);
-    res.status(500).json({ status: false, message: "Internal server error" });
+//     console.error("Error fetching user:", error);
+//     res.status(500).json({ status: false, message: "Internal server error" });
+//   }
+// }));
+
+
+
+userRoute.get("/checklogin", auth, catchAsyncError(async (req, res, next) => {
+
+  let userId = req.user_id
+  if (!userId) {
+    return next(new Errorhandler("user id not found", 400));
   }
+  let user = await volunteerModel.findById(userId).select("name email role address profilePhoto");
+  res.status(200).json({ status: true, message: user })
 }));
 
 
@@ -166,6 +181,22 @@ userRoute.put("/add-address", auth, authorization, catchAsyncError(async (req, r
 }));
 
 
+
+
+
+
+userRoute.post("/upload", auth, upload.single("photo"), catchAsyncError(async (req, res, next) => {
+  if (!req.file) {
+    return next(new Errorhandler("File not found", 400))
+  }
+  const userId = req.user_id
+  if (!userId) {
+    return next(new Errorhandler("userId not found", 400))
+  }
+  const fileName = path.basename(req.file.path)
+  let updated = await volunteerModel.findByIdAndUpdate(userId, { profilePhoto: fileName }, { new: true })
+  res.status(200).json({ message: updated })
+}))
 
 
 

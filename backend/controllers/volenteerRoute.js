@@ -32,31 +32,12 @@ volenteerRoute.get("/volunteer", auth, authorization, catchAsyncError(async (req
     assignedEvents: user.assignedEvents || [],
     hoursLogged: user.hoursLogged || 0,
     profile: user.profile || {},
-    achievements: user.achievements || []
+    achievements: user.achievements || [],
+    profilePhoto: user.profilePhoto || ""
   });
 }));
 
 
 
-
-volenteerRoute.post("/upload", auth, upload.single("photo"), catchAsyncError(async (req, res, next) => {
-  if (!req.file) {
-    return next(new Errorhandler("File not found", 400));
-  }
-
-  const userId = req.user_id;
-  if (!userId) {
-    return next(new Errorhandler("UserId not found", 400));
-  }
-
-  const fileName = path.basename(req.file.path); 
-  const updated = await volunteerModel.findByIdAndUpdate(userId, { profilePhoto: fileName }, { new: true });
-
-  if (!updated) {
-    return next(new Errorhandler("Failed to update profile", 500));
-  }
-
-  res.status(200).json({ message: "Profile photo updated successfully", updated });
-}));
 
 module.exports = { volenteerRoute };
