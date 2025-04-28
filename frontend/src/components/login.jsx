@@ -10,7 +10,7 @@ function Login() {
   const [error, setError] = useState("");
   const [data, setData] = useState({ email: "", password: "" });
   const [isLogin, setIsLogin] = useState(false);
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
   const handleHide = () => setHide(!hide);
 
@@ -32,7 +32,7 @@ function Login() {
         { email, password },
         { withCredentials: true }
       );
-      localStorage.setItem('token',response.data.token)
+      localStorage.setItem("token", response.data.token);
 
       if (response.status === 200) {
         setIsLogin(true);
@@ -78,7 +78,9 @@ function Login() {
         </AnimatePresence>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Email Address</label>
+          <label className="block text-sm font-medium mb-1">
+            Email Address
+          </label>
           <input
             type="email"
             name="email"
@@ -120,21 +122,29 @@ function Login() {
         <motion.button
           whileHover={!loading && { scale: 1.05 }}
           whileTap={!loading && { scale: 0.95 }}
-          disabled={loading} 
-          className={`w-full ${loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"} text-white font-medium py-2 rounded-md transition duration-300`}
+          disabled={loading}
+          className={`w-full ${
+            loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
+          } text-white font-medium py-2 rounded-md transition duration-300`}
           onClick={handleSubmit}
         >
-          {loading ? "Logging in..." : "Login"} 
+          {loading ? "Logging in..." : "Login"}
         </motion.button>
 
-        <div className="text-center text-sm mt-4">
-          <span>Don't have an account? </span>
-          <button
-            onClick={() => navigate("/Signup")}
-            className="text-red-500 hover:underline"
-          >
-            Sign Up
-          </button>
+        <div className="text-center text-sm mt-6 space-y-4">
+          <div className="flex justify-center items-center space-x-2">
+            <span className="text-gray-700 dark:text-gray-300">
+              Don't have an account?
+            </span>
+            <button
+              onClick={() => navigate("/Signup")}
+              className="text-red-500 font-medium hover:underline focus:outline-none hover:text-red-600 transition duration-300"
+            >
+              Sign Up
+            </button>
+          </div>
+
+          <hr className="my-4 border-t-2 border-gray-300 dark:border-gray-600" />
         </div>
       </motion.div>
     </div>

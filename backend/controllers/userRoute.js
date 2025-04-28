@@ -118,34 +118,6 @@ userRoute.post("/login", catchAsyncError(async (req, res, next) => {
 
 
 
-
-// userRoute.get("/checklogin", auth, catchAsyncError(async (req, res, next) => {
-  
-//   const userId = req.user_id; 
-//   if (!userId) {
-//     return res.status(401).json({ status: false, message: "Not authorized" });
-//   }
-  
-//   try {
-    
-//     const user = await volunteerModel.findById(userId).select("name email role address profilePhoto");
-//     console.log(user)
-//     if (!user) {
-     
-//       return res.status(404).json({ status: false, message: "User not found" });
-//     }
-
-    
-//     res.status(200).json({ status: true, message: user });
-//   } catch (error) {
-    
-//     console.error("Error fetching user:", error);
-//     res.status(500).json({ status: false, message: "Internal server error" });
-//   }
-// }));
-
-
-
 userRoute.get("/checklogin", auth, catchAsyncError(async (req, res, next) => {
 
   let userId = req.user_id
@@ -214,7 +186,6 @@ userRoute.get("/logout", catchAsyncError(async (req, res, next) => {
     message: "Logout successful 👋"
   });
 }));
-
 
 
 
