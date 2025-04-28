@@ -3,6 +3,7 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import GoogleButton from "./Googlebutton";
 
 function Login() {
   const navigate = useNavigate();
@@ -145,6 +146,7 @@ function Login() {
           </div>
 
           <hr className="my-4 border-t-2 border-gray-300 dark:border-gray-600" />
+          <GoogleButton/>
         </div>
       </motion.div>
     </div>

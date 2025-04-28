@@ -8,6 +8,7 @@ const catchAsyncError = require("../middleware/catchAsyncError");
 const { auth, authorization } = require("../middleware/auth")
 const { upload } = require("../middleware/multer");
 const path = require("path");
+const passport = require('passport');
 
 
 require("dotenv").config();
@@ -190,6 +191,62 @@ userRoute.get("/logout", catchAsyncError(async (req, res, next) => {
 
 
 
+const googleAuthCallback = async (req, res) => {
+  try {
+    const { profile, user } = req.user;
+
+    const { displayName, emails } = profile;
+    if (!emails || emails.length === 0) {
+      return res.status(400).json({ message: 'Email is required for authentication' });
+    }
+
+    const email = emails[0].value;
+    const name = displayName;
+
+    
+    let existingUser = await volunteerModel.findOne({ email });
+    if (!existingUser) {
+      existingUser = new volunteerModel({
+        name,
+        email,
+        password: null,
+        role: 'user' ,
+        isActivated: true,
+      });
+      await existingUser.save();
+    }
+
+    const token = jwt.sign({ id: existingUser._id, role: existingUser.role }, process.env.SECRET, { expiresIn: "24h" });
+
+    res.cookie("accesstoken", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    });
+
+    res.redirect(`http://localhost:5173/google-success?token=${token}`);
+
+  } catch (err) {
+    console.error("Google Auth Error:", err);
+    res.status(500).json({ message: "Failed to authenticate with Google", error: err.message });
+  }
+};
+
+
+
+userRoute.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+
+userRoute.get(
+  "/google/callback",
+  passport.authenticate("google", { session: false, failureRedirect: "http://localhost:5173/login" }),
+
+  (req, res, next) => {
+   
+    console.log("User object:", req.user);
+    next();
+  },
+  googleAuthCallback
+);
 
 
 module.exports = { userRoute };

@@ -9,6 +9,7 @@ import Homepage from './components/homepage'
 import Profile from './components/profile'
 import './App.css'
 import { jwtDecode } from "jwt-decode";
+import GoogleSuccess from './components/GoogleSuccess'
 function App() {
   const token = localStorage.getItem("token");
 
@@ -28,11 +29,11 @@ function App() {
     <Navbar/>
     <Routes>
     <Route path="/" element={<Home />}></Route>
-    {/* <Route path="/data" element={<Homepage />}></Route> */}
+    <Route path="/data" element={<Homepage />}></Route>
     <Route path="/Login" element={<Login />}></Route>
     <Route path="/Signup" element={<Signup />}></Route>
     <Route path="/volunteer" element={<Volunteer />}></Route>
-
+    <Route path="/google-success" element={<GoogleSuccess />}></Route>
     {userRole=='volunteer' && (
       <Route path="/profile" element={<Profile />}></Route>
     )}

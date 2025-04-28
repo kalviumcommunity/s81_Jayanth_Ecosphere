@@ -3,6 +3,10 @@ const middleware=require("./middleware/error")
 const cors=require("cors")
 const cookieparser=require("cookie-parser")
 const path = require('path');
+const passport =require("passport")
+const {userRoute} = require("./controllers/userRoute")
+const {volenteerRoute} = require("./controllers/volenteerRoute")
+require("./config/passport.js")
 const app = express();
 app.use(express.json());
 
@@ -14,8 +18,6 @@ app.use(cors({
 app.use(cookieparser())
 
 
-const {userRoute} = require("./controllers/userRoute")
-const {volenteerRoute} = require("./controllers/volenteerRoute")
 app.get("/test", async (req, res) => {
     res.status(200).json({message:"your running on machine"})
   });
