@@ -140,6 +140,8 @@ userRoute.put("/add-address", auth, authorization, catchAsyncError(async (req, r
   const userId = req.user_id;
   const { country, city, address, pincode, addressType } = req.body;
 
+
+  
   if (!country || !city || !address || !pincode || !addressType) {
     return next(new Errorhandler("All address fields are required", 400));
   }
@@ -149,6 +151,8 @@ userRoute.put("/add-address", auth, authorization, catchAsyncError(async (req, r
     { $push: { address: req.body } },
     { new: true }
   );
+
+
 
   res.status(200).json({ status: true, message: updatedUser });
 }));
