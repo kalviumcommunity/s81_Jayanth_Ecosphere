@@ -1,4 +1,5 @@
 {
+
   "version": "1",
   "name": "profile photo",
   "type": "collection",
@@ -6,4 +7,5 @@
     "node_modules",
     ".git"
   ]
+  
 }
