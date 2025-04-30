@@ -4,11 +4,15 @@ meta {
   seq: 3
 }
 
+
+
 post {
-  url: http://localhost:4567/profile-photo/upload
+  url: http://localhost:4567/user/profile-photo/upload
   body: multipartForm
   auth: inherit
 }
+
+
 
 body:multipart-form {
   profile photo: @file(C:\Users\K Jayanth\OneDrive\圖片\dark-thor-background-aav1c4k99whnn8zn.jpg)
