@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ImSpinner2 } from "react-icons/im";
 
+
 function GoogleButton() {
   const [loading, setLoading] = useState(false);
 
@@ -48,5 +49,6 @@ function GoogleButton() {
     </motion.div>
   );
 }
+
 
 export default GoogleButton;

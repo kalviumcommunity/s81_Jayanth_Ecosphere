@@ -146,6 +146,7 @@ function Login() {
           </div>
 
           <hr className="my-4 border-t-2 border-gray-300 dark:border-gray-600" />
+          
           <GoogleButton/>
         </div>
       </motion.div>

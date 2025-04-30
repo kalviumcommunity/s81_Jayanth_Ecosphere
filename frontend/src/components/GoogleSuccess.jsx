@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
 function GoogleSuccess() {
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -18,5 +20,6 @@ function GoogleSuccess() {
 
   return <p>Logging in...</p>;
 }
+
 
 export default GoogleSuccess;
