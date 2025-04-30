@@ -121,6 +121,7 @@ userRoute.post("/login", catchAsyncError(async (req, res, next) => {
 
 userRoute.get("/checklogin", auth, catchAsyncError(async (req, res, next) => {
 
+
   let userId = req.user_id
   if (!userId) {
     return next(new Errorhandler("user id not found", 400));
@@ -139,6 +140,7 @@ userRoute.get("/checklogin", auth, catchAsyncError(async (req, res, next) => {
 userRoute.put("/add-address", auth, authorization, catchAsyncError(async (req, res, next) => {
   const userId = req.user_id;
   const { country, city, address, pincode, addressType } = req.body;
+
 
 
 
@@ -165,6 +167,7 @@ userRoute.put("/add-address", auth, authorization, catchAsyncError(async (req, r
 userRoute.post("/upload", auth, upload.single("photo"), catchAsyncError(async (req, res, next) => {
  
  
+  
   if (!req.file) {
     return next(new Errorhandler("File not found", 400))
   }
