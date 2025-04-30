@@ -167,7 +167,7 @@ userRoute.put("/add-address", auth, authorization, catchAsyncError(async (req, r
 userRoute.post("/upload", auth, upload.single("photo"), catchAsyncError(async (req, res, next) => {
  
  
-  
+
   if (!req.file) {
     return next(new Errorhandler("File not found", 400))
   }
@@ -206,6 +206,7 @@ userRoute.get("/logout", catchAsyncError(async (req, res, next) => {
 
 
 
+
 const googleAuthCallback = async (req, res) => {
   try {
     const { profile, user } = req.user;
@@ -215,10 +216,12 @@ const googleAuthCallback = async (req, res) => {
       return res.status(400).json({ message: 'Email is required for authentication' });
     }
 
+
     const email = emails[0].value;
     const name = displayName;
 
     
+
     let existingUser = await volunteerModel.findOne({ email });
     if (!existingUser) {
       existingUser = new volunteerModel({
@@ -231,6 +234,7 @@ const googleAuthCallback = async (req, res) => {
       await existingUser.save();
     }
 
+    
     const token = jwt.sign({ id: existingUser._id, role: existingUser.role }, process.env.SECRET, { expiresIn: "24h" });
 
     res.cookie("accesstoken", token, {
@@ -249,7 +253,9 @@ const googleAuthCallback = async (req, res) => {
 
 
 
+
 userRoute.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+
 
 userRoute.get(
   "/google/callback",
