@@ -1,6 +1,7 @@
 const express = require("express");
 const { volunteerModel } = require("../Model/volenteerSchema");
 const bcrypt = require("bcrypt");
+
 const jwt = require("jsonwebtoken");
 const { sendMail } = require("../utils/mail");
 const Errorhandler = require("../utils/Errorhandler");
@@ -40,6 +41,7 @@ userRoute.post("/signup", catchAsyncError(async (req, res, next) => {
     newUser.address = address;
   }
 
+  
   const token = jwt.sign({ id: newUser._id }, process.env.SECRET, { expiresIn: "24h" });
   const activationUrl = `http://localhost:${port}/user/activation/${token}`;
 
@@ -66,6 +68,7 @@ userRoute.get("/activation/:token", catchAsyncError(async (req, res, next) => {
     return next(new Errorhandler("Token not found 🥺", 404));
   }
 
+  
   jwt.verify(token, process.env.SECRET, async (err, decoded) => {
     if (err) return next(new Errorhandler("Invalid token ❌", 400));
 
@@ -102,6 +105,7 @@ userRoute.post("/login", catchAsyncError(async (req, res, next) => {
     return next(new Errorhandler("Password is incorrect 😅", 400));
   }
 
+  
   const token = jwt.sign({ id: user._id, role: user.role }, process.env.SECRET, { expiresIn: "24h" });
 
   res.cookie("accesstoken", token, {
@@ -234,7 +238,8 @@ const googleAuthCallback = async (req, res) => {
       await existingUser.save();
     }
 
-    
+
+   
     const token = jwt.sign({ id: existingUser._id, role: existingUser.role }, process.env.SECRET, { expiresIn: "24h" });
 
     res.cookie("accesstoken", token, {
