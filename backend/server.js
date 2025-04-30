@@ -10,6 +10,7 @@ app.listen(port,async()=>{
     try{
         
         console.log(`app is running on http://localhost:${port}`)
+        
         connection
     }
     catch(err){
