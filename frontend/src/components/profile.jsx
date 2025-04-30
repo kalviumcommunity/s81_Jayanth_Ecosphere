@@ -105,6 +105,7 @@ export default function Profile() {
           <h1 className="text-3xl font-semibold mb-4">Personal Details</h1>
           <div className="flex flex-col sm:flex-row gap-8">
             {/* Profile Image + Upload */}
+
             <motion.div
               className="flex flex-col items-center gap-4 w-40"
               whileHover={{ scale: 1.1 }}
@@ -137,6 +138,7 @@ export default function Profile() {
                 onChange={changeProfilePhoto}
               />
             </motion.div>
+
 
             {/* Info */}
             <motion.div

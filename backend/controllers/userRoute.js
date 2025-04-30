@@ -141,7 +141,7 @@ userRoute.put("/add-address", auth, authorization, catchAsyncError(async (req, r
   const { country, city, address, pincode, addressType } = req.body;
 
 
-  
+
   if (!country || !city || !address || !pincode || !addressType) {
     return next(new Errorhandler("All address fields are required", 400));
   }
@@ -163,16 +163,24 @@ userRoute.put("/add-address", auth, authorization, catchAsyncError(async (req, r
 
 
 userRoute.post("/upload", auth, upload.single("photo"), catchAsyncError(async (req, res, next) => {
+ 
+ 
   if (!req.file) {
     return next(new Errorhandler("File not found", 400))
   }
+
+
   const userId = req.user_id
   if (!userId) {
     return next(new Errorhandler("userId not found", 400))
   }
+
+  
   const fileName = path.basename(req.file.path)
   let updated = await volunteerModel.findByIdAndUpdate(userId, { profilePhoto: fileName }, { new: true })
   res.status(200).json({ message: updated })
+
+
 }))
 
 
