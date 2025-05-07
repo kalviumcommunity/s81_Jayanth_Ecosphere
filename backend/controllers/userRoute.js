@@ -61,21 +61,21 @@ userRoute.post("/signup", catchAsyncError(async (req, res, next) => {
 
 
 
-userRoute.get("/activation/:token", catchAsyncError(async (req, res, next) => {
-  const { token } = req.params;
+  userRoute.get("/activation/:token", catchAsyncError(async (req, res, next) => {
+    const { token } = req.params;
 
-  if (!token) {
-    return next(new Errorhandler("Token not found 🥺", 404));
-  }
+    if (!token) {
+      return next(new Errorhandler("Token not found 🥺", 404));
+    }
 
-  
-  jwt.verify(token, process.env.SECRET, async (err, decoded) => {
-    if (err) return next(new Errorhandler("Invalid token ❌", 400));
+    
+    jwt.verify(token, process.env.SECRET, async (err, decoded) => {
+      if (err) return next(new Errorhandler("Invalid token ❌", 400));
 
-    await volunteerModel.findByIdAndUpdate(decoded.id, { isActivated: true });
-    res.status(200).json({ status: true, message: "Activation completed 🤞" });
-  });
-}));
+      await volunteerModel.findByIdAndUpdate(decoded.id, { isActivated: true });
+      res.status(200).json({ status: true, message: "Activation completed 🤞" });
+    });
+  }));
 
 
 
@@ -123,16 +123,16 @@ userRoute.post("/login", catchAsyncError(async (req, res, next) => {
 
 
 
-userRoute.get("/checklogin", auth, catchAsyncError(async (req, res, next) => {
+  userRoute.get("/checklogin", auth, catchAsyncError(async (req, res, next) => {
 
 
-  let userId = req.user_id
-  if (!userId) {
-    return next(new Errorhandler("user id not found", 400));
-  }
-  let user = await volunteerModel.findById(userId).select("name email role address profilePhoto");
-  res.status(200).json({ status: true, message: user })
-}));
+    let userId = req.user_id
+    if (!userId) {
+      return next(new Errorhandler("user id not found", 400));
+    }
+    let user = await volunteerModel.findById(userId).select("name email role address profilePhoto");
+    res.status(200).json({ status: true, message: user })
+  }));
 
 
 
@@ -194,18 +194,18 @@ userRoute.post("/upload", auth, upload.single("photo"), catchAsyncError(async (r
 
 
 
-userRoute.get("/logout", catchAsyncError(async (req, res, next) => {
-  res.clearCookie("accesstoken", {
-    httpOnly: true,
-    secure: false,
-    sameSite: "lax"
-  });
+  userRoute.get("/logout", catchAsyncError(async (req, res, next) => {
+    res.clearCookie("accesstoken", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax"
+    });
 
-  res.status(200).json({
-    status: true,
-    message: "Logout successful 👋"
-  });
-}));
+    res.status(200).json({
+      status: true,
+      message: "Logout successful 👋"
+    });
+  }));
 
 
 
@@ -259,20 +259,20 @@ const googleAuthCallback = async (req, res) => {
 
 
 
-userRoute.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+  userRoute.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
 
-userRoute.get(
-  "/google/callback",
-  passport.authenticate("google", { session: false, failureRedirect: "http://localhost:5173/login" }),
+  userRoute.get(
+    "/google/callback",
+    passport.authenticate("google", { session: false, failureRedirect: "http://localhost:5173/login" }),
 
-  (req, res, next) => {
-   
-    console.log("User object:", req.user);
-    next();
-  },
-  googleAuthCallback
-);
+    (req, res, next) => {
+    
+      console.log("User object:", req.user);
+      next();
+    },
+    googleAuthCallback
+  );
 
 
 module.exports = { userRoute };
