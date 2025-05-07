@@ -21,39 +21,39 @@ const port = process.env.PORT;
 
 
 
-userRoute.post("/signup", catchAsyncError(async (req, res, next) => {
-  const { name, email, password, address, role } = req.body;
+  userRoute.post("/signup", catchAsyncError(async (req, res, next) => {
+    const { name, email, password, address, role } = req.body;
 
-  if (!name || !email || !password) {
-    return next(new Errorhandler("Name, email and password required ❌", 400));
-  }
+    if (!name || !email || !password) {
+      return next(new Errorhandler("Name, email and password required ❌", 400));
+    }
 
-  const existingUser = await volunteerModel.findOne({ email });
-  if (existingUser) {
-    return next(new Errorhandler("User already exists 😵‍💫", 409));
-  }
+    const existingUser = await volunteerModel.findOne({ email });
+    if (existingUser) {
+      return next(new Errorhandler("User already exists 😵‍💫", 409));
+    }
 
-  const hashedPassword = await bcrypt.hash(password, 7);
-  const newUser = new volunteerModel({ name, email, password: hashedPassword });
+    const hashedPassword = await bcrypt.hash(password, 7);
+    const newUser = new volunteerModel({ name, email, password: hashedPassword });
 
-  if (role === "volunteer") {
-    newUser.role = "volunteer";
-    newUser.address = address;
-  }
+    if (role === "volunteer") {
+      newUser.role = "volunteer";
+      newUser.address = address;
+    }
 
-  
-  const token = jwt.sign({ id: newUser._id }, process.env.SECRET, { expiresIn: "24h" });
-  const activationUrl = `http://localhost:${port}/user/activation/${token}`;
+    
+    const token = jwt.sign({ id: newUser._id }, process.env.SECRET, { expiresIn: "24h" });
+    const activationUrl = `http://localhost:${port}/user/activation/${token}`;
 
-  await sendMail({
-    email: newUser.email,
-    subject: "Activate your account",
-    message: `Hello ${newUser.name}, please click the link to activate your account: ${activationUrl}`,
-  });
+    await sendMail({
+      email: newUser.email,
+      subject: "Activate your account",
+      message: `Hello ${newUser.name}, please click the link to activate your account: ${activationUrl}`,
+    });
 
-  await newUser.save();
-  res.status(201).json({ status: true, message: "Registration successful 👍" });
-}));
+    await newUser.save();
+    res.status(201).json({ status: true, message: "Registration successful 👍" });
+  }));
 
 
 
@@ -84,38 +84,38 @@ userRoute.post("/signup", catchAsyncError(async (req, res, next) => {
 
 
 
-userRoute.post("/login", catchAsyncError(async (req, res, next) => {
-  const { email, password } = req.body;
+  userRoute.post("/login", catchAsyncError(async (req, res, next) => {
+    const { email, password } = req.body;
 
-  if (!email || !password) {
-    return next(new Errorhandler("Email and password are required ❌", 400));
-  }
+    if (!email || !password) {
+      return next(new Errorhandler("Email and password are required ❌", 400));
+    }
 
-  const user = await volunteerModel.findOne({ email });
-  if (!user) {
-    return next(new Errorhandler("Please signup 🥺", 400));
-  }
+    const user = await volunteerModel.findOne({ email });
+    if (!user) {
+      return next(new Errorhandler("Please signup 🥺", 400));
+    }
 
-  if (!user.isActivated) {
-    return next(new Errorhandler("Please activate your account first 🥺", 403));
-  }
+    if (!user.isActivated) {
+      return next(new Errorhandler("Please activate your account first 🥺", 403));
+    }
 
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    return next(new Errorhandler("Password is incorrect 😅", 400));
-  }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return next(new Errorhandler("Password is incorrect 😅", 400));
+    }
 
-  
-  const token = jwt.sign({ id: user._id, role: user.role }, process.env.SECRET, { expiresIn: "24h" });
+    
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.SECRET, { expiresIn: "24h" });
 
-  res.cookie("accesstoken", token, {
-    httpOnly: true,
-    secure: false,
-    sameSite: "lax"
-  });
+    res.cookie("accesstoken", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax"
+    });
 
-  res.status(200).json({ status: true, message: "Login successful 👍", token });
-}));
+    res.status(200).json({ status: true, message: "Login successful 👍", token });
+  }));
 
 
 
@@ -168,27 +168,27 @@ userRoute.put("/add-address", auth, authorization, catchAsyncError(async (req, r
 
 
 
-userRoute.post("/upload", auth, upload.single("photo"), catchAsyncError(async (req, res, next) => {
- 
- 
-
-  if (!req.file) {
-    return next(new Errorhandler("File not found", 400))
-  }
-
-
-  const userId = req.user_id
-  if (!userId) {
-    return next(new Errorhandler("userId not found", 400))
-  }
-
+  userRoute.post("/upload", auth, upload.single("photo"), catchAsyncError(async (req, res, next) => {
   
-  const fileName = path.basename(req.file.path)
-  let updated = await volunteerModel.findByIdAndUpdate(userId, { profilePhoto: fileName }, { new: true })
-  res.status(200).json({ message: updated })
+  
+
+    if (!req.file) {
+      return next(new Errorhandler("File not found", 400))
+    }
 
 
-}))
+    const userId = req.user_id
+    if (!userId) {
+      return next(new Errorhandler("userId not found", 400))
+    }
+
+    
+    const fileName = path.basename(req.file.path)
+    let updated = await volunteerModel.findByIdAndUpdate(userId, { profilePhoto: fileName }, { new: true })
+    res.status(200).json({ message: updated })
+
+
+  }))
 
 
 
