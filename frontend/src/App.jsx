@@ -7,6 +7,7 @@ import Home from './pages/home'
 import Navbar from './pages/Navbar'
 import Homepage from './components/homepage'
 import Profile from './components/profile'
+import Otp from './components/otpgenerate'
 import './App.css'
 import { jwtDecode } from "jwt-decode";
 import GoogleSuccess from './components/GoogleSuccess'
@@ -33,6 +34,7 @@ function App() {
     <Route path="/Login" element={<Login />}></Route>
     <Route path="/Signup" element={<Signup />}></Route>
     <Route path="/volunteer" element={<Volunteer />}></Route>
+    <Route path="/Otp" element={<Otp />}></Route>
     <Route path="/google-success" element={<GoogleSuccess />}></Route>
     {userRole=='volunteer' && (
       <Route path="/profile" element={<Profile />}></Route>

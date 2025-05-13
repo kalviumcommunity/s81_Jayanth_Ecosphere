@@ -115,7 +115,8 @@ function Login() {
             <input type="checkbox" className="form-checkbox rounded" />
             <span>Remember me</span>
           </label>
-          <button className="text-blue-600 dark:text-blue-400 hover:underline">
+          <button onClick={() => navigate("/Otp")}
+           className="text-blue-600 dark:text-blue-400 hover:underline">
             Forgot password?
           </button>
         </div>
