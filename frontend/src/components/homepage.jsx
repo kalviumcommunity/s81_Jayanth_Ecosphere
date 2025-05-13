@@ -119,7 +119,7 @@ const Homepage = () => {
   return (
     <div className={darkMode ? "min-h-screen bg-gray-900 text-white" : "min-h-screen bg-gray-50 text-gray-900"}>
       <header className="flex justify-between items-center p-6">
-        <h1 className="text-2xl font-extrabold">Eco-Friendly Hub</h1>
+        <h1 className="text-2xl font-extrabold">Welcome to EcoSphere</h1>
         <motion.button
           onClick={toggleDarkMode}
           aria-label="Toggle dark mode"
@@ -226,7 +226,7 @@ const Homepage = () => {
 
       <footer className="bg-gray-800 text-white p-6 mt-8">
         <div className="text-center">
-          <p>&copy; 2025 Eco-Friendly Hub. All rights reserved.</p>
+          <p>&copy; 2025 EcoSphere. All rights reserved.</p>
           <div className="mt-2">
             <a href="#" className="text-blue-400 hover:underline mr-4">About Us</a>
             <a href="#" className="text-blue-400 hover:underline mr-4">Contact</a>
