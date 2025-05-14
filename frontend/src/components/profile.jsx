@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import {useNavigate} from "react-router-dom"
 import { motion } from "framer-motion";
 
 export default function Profile() {
@@ -15,6 +16,9 @@ export default function Profile() {
   const [addresses, setAddresses] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
 
+
+  const navigate=useNavigate()
+  
   const toggleDarkMode = () => {
     setDarkMode((prev) => !prev);
   };
@@ -182,39 +186,27 @@ export default function Profile() {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            <div>
-              {addresses.length > 0 ? (
-                addresses.map((address, index) => (
-                  <div
-                    key={index}
-                    className="text-base font-light break-words space-y-1 mt-2"
-                  >
-                    <p>
-                      <strong>Type:</strong> {address.addressType}
-                    </p>
-                    <p>
-                      <strong>Address:</strong> {address.address}
-                    </p>
-                    <p>
-                      <strong>Area:</strong> {address.area}
-                    </p>
-                    <p>
-                      <strong>City:</strong> {address.city}
-                    </p>
-                    <p>
-                      <strong>Pincode:</strong> {address.pincode}
-                    </p>
-                    <p>
-                      <strong>Country:</strong> {address.country}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <div className="text-base font-light mt-2">
-                  No address found.
+            {addresses.length > 0 ? (
+              addresses.map((address, index) => (
+                <div
+                  key={index}
+                  className="text-base font-light break-words space-y-1 mt-2 border-b pb-4"
+                >
+                  <p><strong>Type:</strong> {address.addressType}</p>
+                  <p><strong>Address:</strong> {address.address}</p>
+                  <p><strong>Area:</strong> {address.area}</p>
+                  <p><strong>City:</strong> {address.city}</p>
+                  <p><strong>Pincode:</strong> {address.pincode}</p>
+                  <p><strong>Country:</strong> {address.country}</p>
+                  <button className="mt-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition"  onClick={()=>{navigate("/Address-up")}}>
+                    Update
+                  </button>
                 </div>
-              )}
-            </div>
+              ))
+            ) : (
+              <div className="text-base font-light mt-2">No address found.</div>
+            )}
+            
           </motion.div>
         </motion.section>
 
