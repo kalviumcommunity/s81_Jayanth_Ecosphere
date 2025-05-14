@@ -218,40 +218,6 @@ export default function Profile() {
           </motion.div>
         </motion.section>
 
-        {/* Change Password Section */}
-        {/* <motion.section
-          className="space-y-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h2 className="text-2xl font-semibold">Change Password</h2>
-          <motion.div
-            className={`rounded-xl p-4 shadow-md ${bgCard}`}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <div>
-              <div className="text-xl font-medium">NEW PASSWORD</div>
-              <input
-                type="password"
-                placeholder="Enter new password"
-                className={`w-full p-2 mt-2 rounded-lg border ${inputStyle}`}
-              />
-            </div>
-            <div className="mt-4">
-              <div className="text-xl font-medium">CONFIRM PASSWORD</div>
-              <input
-                type="password"
-                placeholder="Confirm your new password"
-                className={`w-full p-2 mt-2 rounded-lg border ${inputStyle}`}
-              />
-            </div>
-            <button className="mt-4 bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded-lg">
-              Change Password
-            </button>
-          </motion.div>
-        </motion.section> */}
       </motion.div>
     </div>
   );
