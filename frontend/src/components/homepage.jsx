@@ -1,230 +1,116 @@
-import React, { useState, useEffect } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import { motion } from "framer-motion";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-const Homepage = () => {
-  const [darkMode, setDarkMode] = useState(false);
-  const [metrics, setMetrics] = useState({
-    airQuality: 0,
-    waterQuality: 0,
-    wasteLevels: "",
-    energyUsage: "",
-  });
-  const [loading, setLoading] = useState(true);
-  const [history, setHistory] = useState([]);
-  const [timeRange, setTimeRange] = useState("day");
-  const [tipIndex, setTipIndex] = useState(Math.floor(Math.random() * 3));
+const disasterCards = {
+  leftTall: {
+    title: "Wildfire",
+    desc: "Rapidly spreading fire causing destruction to forests and wildlife.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/0/05/Burnout_ops_on_Mangum_Fire_McCall_Smokejumpers.jpg",
+  },
+  col1Top: {
+    title: "Flood",
+    desc: "Overflow of water submerging land and properties.",
+    img: "https://icdo.org/files/floods.jpg",
+  },
+  col1Bottom: {
+    title: "Landslide",
+    desc: "Sudden movement of rock and soil down a slope.",
+    img: "https://www.abhibus.com/blog/wp-content/uploads/2023/06/Safety-Tips-and-Precautions-During-landslide-1-696x464.jpg",
+  },
+  centerTall: {
+    title: "Earthquake",
+    desc: "Violent shaking of the ground caused by tectonic movements.",
+    img: "https://static.scientificamerican.com/sciam/cache/file/7F5C87CE-C719-4650-B4E8AEF44415E806_source.jpg?w=1200",
+  },
+  col2Top: {
+    title: "Cyclone",
+    desc: "Powerful storm system with strong winds and rain.",
+    img: "https://img.theweek.in/content/dam/week/news/2020/images/2022/2/10/Super-Cyclone-Tornado-forming-destruction-Severe-hurricane-storm-weather-clouds-shut.jpg",
+  },
+  col2Bottom: {
+    title: "Tsunami",
+    desc: "Huge ocean wave caused by underwater earthquakes.",
+    img: "https://media.istockphoto.com/id/182006434/photo/tsunami-waves.jpg?s=612x612&w=0&k=20&c=odmIVgu3rJfEgMg1f_-V1Q4FXv2RPxQYFqrzR-PxoyM=",
+  },
+  bottom1: {
+    title: "Climate Resilience",
+    desc: "Learn how communities adapt to climate change impacts.",
+    img: "https://www.indiafilings.com/learn/wp-content/uploads/2019/03/Climate-Resilience-Building-Among-Farmers.jpg",
+  },
+  bottom2: {
+    title: "Disaster Relief Info",
+    desc: "Access emergency resources and government aid.",
+    img: "https://radiant.in/wp-content/uploads/2024/09/Deployment-of-IT-Infrastructure-for-Disaster-Relief-Camps.png",
+  },
+};
 
-  const tips = [
-    "Tip: Turn off the tap while brushing your teeth. Saves 6L/min!",
-    "Tip: Switch to LED lights to save energy.",
-    "Tip: Use public transport to reduce emissions.",
-  ];
+const DisasterCard = ({ title, desc, img, tall = false }) => (
+  <div
+    className={`relative bg-white rounded-3xl overflow-hidden border border-gray-300 ${
+      tall ? "min-h-[600px] p-16" : "min-h-[280px] p-12"
+    } flex items-center justify-center`}
+  >
+    <img
+      src={img}
+      alt={title}
+      className="absolute w-full h-full object-cover opacity-80"
+    />
+    <div className="relative z-10 text-white text-center px-4">
+      <h2 className="text-2xl font-bold">{title}</h2>
+      <p className="text-sm mt-2">{desc}</p>
+    </div>
+  </div>
+);
 
-  const toggleDarkMode = () => {
-    setDarkMode((prev) => !prev);
-  };
-
-  const generateMetricsData = (range) => {
-    setLoading(true);
-    const staticMetrics = {
-      airQuality: 34,
-      waterQuality: 73,
-      wasteLevels: "High",
-      energyUsage: "204 kWh",
-    };
-    setMetrics(staticMetrics);
-
-    let historyData = [];
-    if (range === "day") {
-      historyData = Array.from({ length: 24 }, (_, hour) => {
-        const time = new Date();
-        time.setHours(hour, 0, 0, 0);
-        return {
-          name: time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          AQI: 30 + Math.floor(Math.random() * 10),
-        };
-      });
-    } else if (range === "week") {
-      historyData = Array.from({ length: 7 }, (_, day) => {
-        const time = new Date();
-        time.setDate(time.getDate() - time.getDay() + day);
-        return {
-          name: time.toLocaleDateString(),
-          AQI: 30 + Math.floor(Math.random() * 10),
-        };
-      });
-    } else if (range === "month") {
-      historyData = Array.from({ length: 30 }, (_, day) => {
-        const time = new Date();
-        time.setDate(day + 1);
-        return {
-          name: time.toLocaleDateString(),
-          AQI: 30 + Math.floor(Math.random() * 10),
-        };
-      });
-    } else if (range === "year") {
-      historyData = Array.from({ length: 12 }, (_, month) => {
-        const time = new Date();
-        time.setMonth(month);
-        return {
-          name: time.toLocaleString("default", { month: "short" }),
-          AQI: 30 + Math.floor(Math.random() * 10),
-        };
-      });
-    }
-
-    setHistory(historyData);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    generateMetricsData(timeRange);
-  }, [timeRange]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTipIndex(Math.floor(Math.random() * tips.length));
-    }, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleTimeRangeChange = (e) => {
-    setTimeRange(e.target.value);
-  };
-
-  const cardBase = darkMode ? "bg-gray-700 text-white" : "bg-white text-gray-900";
-
-  const greeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
-  };
-
-  const statusLabel = (aqi) => {
-    if (aqi < 50) return "Good";
-    if (aqi < 100) return "Moderate";
-    return "Unhealthy";
-  };
+function Homepage() {
+  const navigate = useNavigate();
 
   return (
-    <div className={darkMode ? "min-h-screen bg-gray-900 text-white" : "min-h-screen bg-gray-50 text-gray-900"}>
-      <header className="flex justify-between items-center p-6">
-        <h1 className="text-2xl font-extrabold">Welcome to EcoSphere</h1>
-        <motion.button
-          onClick={toggleDarkMode}
-          aria-label="Toggle dark mode"
-          className="p-2 rounded-full"
-          whileTap={{ rotate: 360 }}
-        >
-          {darkMode ? "🌙" : "☀"}
-        </motion.button>
-      </header>
-
-      <section className="p-6">
-        <h2 className="text-xl font-medium mb-2">{greeting()}, Jayanth! 🌿</h2>
-        <p className="mb-4 italic text-sm text-green-600">{tips[tipIndex]}</p>
-        {loading ? (
-          <div className="flex justify-center items-center">
-            <div className="spinner-border animate-spin"></div>
-            <p>Loading metrics...</p>
+    <>
+      <div className="bg-gradient-to-br from-gray-100 to-gray-300 min-h-screen py-20 px-10">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-14 max-w-screen-3xl mx-auto">
+          <div className="cursor-pointer flex flex-col gap-12" onClick={() => navigate("/wildfire")}>
+            <DisasterCard {...disasterCards.leftTall} tall />
           </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`${cardBase} p-6 rounded-lg shadow-lg`}>
-              <h3 className="text-xl font-semibold">Air Quality</h3>
-              <p className="text-sm mt-1">Status: <span className="font-semibold">{statusLabel(metrics.airQuality)}</span></p>
-              <div className="mt-2 text-center text-4xl font-bold" style={{
-                color: metrics.airQuality < 50 ? '#22c55e' : metrics.airQuality < 100 ? '#facc15' : '#ef4444'
-              }}>
-                {metrics.airQuality} AQI
-              </div>
-            </motion.div>
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`${cardBase} p-6 rounded-lg shadow-lg`}>
-              <h3 className="text-xl font-semibold">Water Quality</h3>
-              <div className="mt-2 text-center text-4xl font-bold text-blue-400">
-                {metrics.waterQuality}%
-              </div>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`${cardBase} p-6 rounded-lg shadow-lg`}>
-              <h3 className="text-xl font-semibold">Waste Levels</h3>
-              <div className="mt-2 text-center text-4xl font-bold">{metrics.wasteLevels}</div>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`${cardBase} p-6 rounded-lg shadow-lg`}>
-              <h3 className="text-xl font-semibold">Energy Usage</h3>
-              <div className="mt-2 text-center text-4xl font-bold text-green-400">
-                {metrics.energyUsage}
-              </div>
-            </motion.div>
+          <div className="flex flex-col gap-12">
+            <div className="cursor-pointer" onClick={() => navigate("/flood")}>
+              <DisasterCard {...disasterCards.col1Top} />
+            </div>
+            <div className="cursor-pointer" onClick={() => navigate("/landslide")}>
+              <DisasterCard {...disasterCards.col1Bottom} />
+            </div>
           </div>
-        )}
-      </section>
 
-      <section className="p-6">
-        <h2 className="text-xl font-semibold mb-4">Air Quality Trend</h2>
-        <select
-          onChange={handleTimeRangeChange}
-          value={timeRange}
-          className={`${cardBase} mb-4 p-2 bg-gray-200 rounded`}
-        >
-          <option value="day">Day</option>
-          <option value="week">Week</option>
-          <option value="month">Month</option>
-          <option value="year">Year</option>
-        </select>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={history}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip  />
-            <Line type="monotone" dataKey="AQI" stroke="#8884d8"  activeDot={{ r: 8 }} />
-          </LineChart>
-        </ResponsiveContainer>
-      </section>
+          <div className="cursor-pointer" onClick={() => navigate("/earthquake")}>
+            <DisasterCard {...disasterCards.centerTall} tall />
+          </div>
 
-      <section className="p-6">
-        <h2 className="text-xl font-semibold mb-4">Action Center</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {["🌱", "⚠", "💧", "♻"].map((icon, index) => (
-            <motion.div
-              key={index}
-              initial={{ scale: 0.95, opacity: 0 }}
-              whileInView={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.3 }}
-              className={`${cardBase} p-8 rounded-lg shadow-lg`}
-            >
-              <div className="text-3xl mb-4">{icon}</div>
-              <h3 className="text-2xl font-semibold mb-4">{[
-                "Plant a Tree",
-                "Disaster Tips",
-                "Water Saving Tips",
-                "Eco-Friendly Lifestyle",
-              ][index]}</h3>
-              <p>{[
-                "Understand the benefits of planting a tree and learn the best practices for growing one.",
-                "Get prepared for emergencies with expert advice on how to protect yourself and your loved ones.",
-                "Explore practical and sustainable ways to conserve water in your daily life.",
-                "Learn how to reduce your carbon footprint and live more sustainably through easy lifestyle changes.",
-              ][index]}</p>
-            </motion.div>
-          ))}
+          <div className="flex flex-col gap-12">
+            <div className="cursor-pointer" onClick={() => navigate("/cyclone")}>
+              <DisasterCard {...disasterCards.col2Top} />
+            </div>
+            <div className="cursor-pointer" onClick={() => navigate("/tsunami")}>
+              <DisasterCard {...disasterCards.col2Bottom} />
+            </div>
+          </div>
+
+          <div
+            className="col-span-1 md:col-span-2 cursor-pointer"
+            onClick={() => navigate("/climate-resilience")}
+          >
+            <DisasterCard {...disasterCards.bottom1} tall />
+          </div>
+          <div
+            className="col-span-1 md:col-span-2 cursor-pointer"
+            onClick={() => navigate("/disaster-relief")}
+          >
+            <DisasterCard {...disasterCards.bottom2} tall />
+          </div>
         </div>
-      </section>
+      </div>
 
-      <footer className="bg-gray-800 text-white p-6 mt-8">
+      <footer className="bg-gray-800 text-white p-6">
         <div className="text-center">
           <p>&copy; 2025 EcoSphere. All rights reserved.</p>
           <div className="mt-2">
@@ -234,8 +120,8 @@ const Homepage = () => {
           </div>
         </div>
       </footer>
-    </div>
+    </>
   );
-};
+}
 
 export default Homepage;

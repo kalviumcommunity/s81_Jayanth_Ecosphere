@@ -5,6 +5,37 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Function to render each letter with image
+const letterStyles = {
+  E: "https://upload.wikimedia.org/wikipedia/commons/3/36/Large_bonfire.jpg",
+  c: "https://upload.wikimedia.org/wikipedia/commons/3/36/Large_bonfire.jpg",
+  o: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQi5FQPxO36goMLOSzhRB2C3xPXHY9sy5Ab7w&s",
+  S: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQi5FQPxO36goMLOSzhRB2C3xPXHY9sy5Ab7w&s",
+  p: "https://energyeducation.ca/wiki/images/d/d3/Air-2716_640.jpg",
+  h: "https://energyeducation.ca/wiki/images/d/d3/Air-2716_640.jpg",
+  e: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJVVmeV-x1KWbrgXh34WTHCzqxrHrhwZUdUw&s",
+  r: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJVVmeV-x1KWbrgXh34WTHCzqxrHrhwZUdUw&s",
+};
+
+const StyledLetter = ({ letter }) => {
+  if (letter === " ") {
+    return <span className="inline-block w-2" />;
+  }
+
+  const bgImage = letterStyles[letter] || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJVVmeV-x1KWbrgXh34WTHCzqxrHrhwZUdUw&s";
+
+  return (
+    <span
+      className="inline-block bg-cover bg-center text-transparent bg-clip-text"
+      style={{
+        backgroundImage: `url("${bgImage}")`,
+      }}
+    >
+      {letter}
+    </span>
+  );
+};
+
 const Navbarpage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -15,12 +46,9 @@ const Navbarpage = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:4567/user/checklogin",
-          {
-            withCredentials: true,
-          }
-        );
+        const response = await axios.get("http://localhost:4567/user/checklogin", {
+          withCredentials: true,
+        });
         if (response.status === 200) {
           setIsLoggedIn(true);
         }
@@ -28,7 +56,6 @@ const Navbarpage = () => {
         console.log("Error fetching user:", error);
       }
     };
-
     fetchUser();
   }, []);
 
@@ -75,25 +102,23 @@ const Navbarpage = () => {
   }
 
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-md px-6 py-4">
+    <nav className="bg-white dark:bg-gray-800 shadow-md px-6 py-4 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <motion.h1
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="text-2xl font-bold text-blue-600"
+          className="text-4xl font-extrabold"
         >
-          Eco Sphere
+          {"Eco Sphere".split("").map((char, index) => (
+            <StyledLetter key={index} letter={char} />
+          ))}
         </motion.h1>
 
         <div className="space-x-6 flex items-center">
           {isLoggedIn ? (
             <div className="relative" ref={sidebarRef}>
-              <motion.div
-                whileTap={{ scale: 0.9 }}
-                whileHover={{ scale: 1.1 }}
-                className="inline-block"
-              >
+              <motion.div whileTap={{ scale: 0.9 }} whileHover={{ scale: 1.1 }} className="inline-block">
                 <CgProfile
                   size={24}
                   className="text-gray-700 dark:text-gray-200 hover:text-blue-500 cursor-pointer"
@@ -122,24 +147,23 @@ const Navbarpage = () => {
                         Home
                       </NavLink>
 
-                      {userRole == "volunteer" && (
-                        <motion.li
-                          whileHover={{ x: 5 }}
-                          className="text-gray-700 dark:text-gray-200 hover:text-blue-500 cursor-pointer transition block"
-                          onClick={() => navigate("/profile")}
-                        >
-                          Profile
-                        </motion.li>
-                      )}
-
-                      {userRole == "volunteer" && (
-                        <motion.li
-                          whileHover={{ x: 5 }}
-                          className="text-gray-700 dark:text-gray-200 hover:text-blue-500 cursor-pointer transition block"
-                          onClick={() => navigate("/volunteer")}
-                        >
-                          Volunteer
-                        </motion.li>
+                      {userRole === "volunteer" && (
+                        <>
+                          <motion.li
+                            whileHover={{ x: 5 }}
+                            className="text-gray-700 dark:text-gray-200 hover:text-blue-500 cursor-pointer transition block"
+                            onClick={() => navigate("/profile")}
+                          >
+                            Profile
+                          </motion.li>
+                          <motion.li
+                            whileHover={{ x: 5 }}
+                            className="text-gray-700 dark:text-gray-200 hover:text-blue-500 cursor-pointer transition block"
+                            onClick={() => navigate("/volunteer")}
+                          >
+                            Volunteer
+                          </motion.li>
+                        </>
                       )}
 
                       <motion.li
