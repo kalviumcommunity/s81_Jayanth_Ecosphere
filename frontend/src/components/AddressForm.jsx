@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 function AddressForm({ onSubmit }) {
   const [formData, setFormData] = useState({
-    country: '',
-    city: '',
-    address: '',
-    pincode: '',
-    area: '',
-    addressType: '', // e.g. "Home", "Work"
+    country: "",
+    city: "",
+    address: "",
+    pincode: "",
+    area: "",
+    addressType: "", // e.g. "Home", "Work"
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
@@ -20,13 +20,13 @@ function AddressForm({ onSubmit }) {
     // Convert pincode to Number
     const dataToSubmit = {
       ...formData,
-      pincode: Number(formData.pincode)
+      pincode: Number(formData.pincode),
     };
     if (onSubmit) onSubmit(dataToSubmit);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto p-4 border rounded shadow">
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto p-4 glass-card">
       <h2 className="text-xl font-semibold mb-4">Update Address</h2>
 
       <label className="block mb-2">
@@ -36,7 +36,7 @@ function AddressForm({ onSubmit }) {
           name="country"
           value={formData.country}
           onChange={handleChange}
-          className="w-full mt-1 p-2 border rounded"
+          className="glass-input w-full mt-1"
           required
         />
       </label>
@@ -48,7 +48,7 @@ function AddressForm({ onSubmit }) {
           name="city"
           value={formData.city}
           onChange={handleChange}
-          className="w-full mt-1 p-2 border rounded"
+          className="glass-input w-full mt-1"
           required
         />
       </label>
@@ -60,7 +60,7 @@ function AddressForm({ onSubmit }) {
           name="address"
           value={formData.address}
           onChange={handleChange}
-          className="w-full mt-1 p-2 border rounded"
+          className="glass-input w-full mt-1"
           required
         />
       </label>
@@ -72,7 +72,7 @@ function AddressForm({ onSubmit }) {
           name="pincode"
           value={formData.pincode}
           onChange={handleChange}
-          className="w-full mt-1 p-2 border rounded"
+          className="glass-input w-full mt-1"
           required
         />
       </label>
@@ -84,7 +84,7 @@ function AddressForm({ onSubmit }) {
           name="area"
           value={formData.area}
           onChange={handleChange}
-          className="w-full mt-1 p-2 border rounded"
+          className="glass-input w-full mt-1"
         />
       </label>
 
@@ -94,7 +94,7 @@ function AddressForm({ onSubmit }) {
           name="addressType"
           value={formData.addressType}
           onChange={handleChange}
-          className="w-full mt-1 p-2 border rounded"
+          className="glass-input w-full mt-1"
         >
           <option value="">Select Type</option>
           <option value="Home">Home</option>
@@ -103,7 +103,7 @@ function AddressForm({ onSubmit }) {
         </select>
       </label>
 
-      <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      <button type="submit" className="glass-btn">
         Save Address
       </button>
     </form>

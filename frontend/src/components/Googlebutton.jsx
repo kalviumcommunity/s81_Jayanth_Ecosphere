@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ImSpinner2 } from "react-icons/im";
 
-
 function GoogleButton() {
   const [loading, setLoading] = useState(false);
 
@@ -10,7 +9,7 @@ function GoogleButton() {
     setLoading(true);
     setTimeout(() => {
       window.location.href = "http://localhost:4567/user/google";
-    }, 500); 
+    }, 500);
   };
 
   return (
@@ -22,33 +21,53 @@ function GoogleButton() {
     >
       <motion.button
         onClick={handleGoogleSignIn}
-        whileHover={!loading && { scale: 1.03, boxShadow: "0 4px 14px rgba(0,0,0,0.1)" }}
+        whileHover={
+          !loading && {
+            scale: 1.03,
+            boxShadow: "0 6px 24px rgba(17,24,39,0.08)",
+          }
+        }
         whileTap={!loading && { scale: 0.97 }}
         disabled={loading}
         transition={{ type: "spring", stiffness: 300 }}
-        className={`flex items-center justify-center w-full gap-3 border border-[#dadce0] rounded-md shadow-sm px-6 py-2 bg-white text-[#3c4043] text-sm font-medium transition duration-300 hover:bg-[#f8f9fa] ${
+        className={`flex items-center justify-center w-full gap-3 rounded-md px-6 py-2 text-sm font-medium transition duration-300 ${
           loading ? "opacity-70 cursor-not-allowed" : ""
-        }`}
-        style={{
-          fontFamily: "Roboto, sans-serif",
-        }}
+        } glass-btn`}
       >
         {loading ? (
-          <ImSpinner2 className="animate-spin w-5 h-5" />
+          <ImSpinner2 className="animate-spin w-5 h-5 text-indigo-600" />
         ) : (
           <>
-            <img
-              src="https://developers.google.com/identity/images/g-logo.png"
-              alt="Google Logo"
-              className="w-5 h-5 object-contain"
-            />
-            Sign in with Google
+            {/* Inline Google 'G' svg to avoid external image dependency */}
+            <svg
+              className="w-5 h-5"
+              viewBox="0 0 533.5 544.3"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden
+            >
+              <path
+                fill="#4285F4"
+                d="M533.5 278.4c0-18.9-1.6-37-4.6-54.6H272v103.3h146.9c-6.4 34.6-25 63.9-53.4 83.5v69.3h86.3c50.5-46.6 81.7-115.4 81.7-201.5z"
+              />
+              <path
+                fill="#34A853"
+                d="M272 544.3c72.6 0 133.6-24 178.2-65.4l-86.3-69.3c-24 16.2-54.9 25.8-91.9 25.8-70.6 0-130.5-47.6-151.9-111.6H30.1v70.1C74.8 485.6 167.6 544.3 272 544.3z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M120.1 326.4c-10.9-32.7-10.9-67.9 0-100.6V155.7H30.1c-42.8 84.7-42.8 185.1 0 269.8l90-99.1z"
+              />
+              <path
+                fill="#EA4335"
+                d="M272 107.7c39.5 0 75.1 13.6 103 40.4l77.2-77.2C402.3 24.6 342.8 0 272 0 167.6 0 74.8 58.7 30.1 155.7l90 70.1C141.5 155.3 201.4 107.7 272 107.7z"
+              />
+            </svg>
+            <span className="text-gray-800">Sign in with Google</span>
           </>
         )}
       </motion.button>
     </motion.div>
   );
 }
-
 
 export default GoogleButton;

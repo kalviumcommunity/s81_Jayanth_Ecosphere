@@ -4,28 +4,31 @@ const bcrypt = require("bcrypt");
 
 const jwt = require("jsonwebtoken");
 const { sendMail } = require("../utils/mail");
+const {
+  activationEmailHtml,
+  activationEmailText,
+} = require("../utils/accountActivationEmailTemplate");
 const Errorhandler = require("../utils/Errorhandler");
 const catchAsyncError = require("../middleware/catchAsyncError");
-const { auth, authorization } = require("../middleware/auth")
+const { auth, authorization } = require("../middleware/auth");
 const { upload } = require("../middleware/multer");
 const path = require("path");
-const passport = require('passport');
-
+const passport = require("passport");
 
 require("dotenv").config();
 
 const userRoute = express.Router();
 const port = process.env.PORT;
 
-
-
-
-
-  userRoute.post("/signup", catchAsyncError(async (req, res, next) => {
+userRoute.post(
+  "/signup",
+  catchAsyncError(async (req, res, next) => {
     const { name, email, password, address, role } = req.body;
 
     if (!name || !email || !password) {
-      return next(new Errorhandler("Name, email and password required ❌", 400));
+      return next(
+        new Errorhandler("Name, email and password required ❌", 400)
+      );
     }
 
     const existingUser = await volunteerModel.findOne({ email });
@@ -34,57 +37,84 @@ const port = process.env.PORT;
     }
 
     const hashedPassword = await bcrypt.hash(password, 7);
-    const newUser = new volunteerModel({ name, email, password: hashedPassword });
+    const newUser = new volunteerModel({
+      name,
+      email,
+      password: hashedPassword,
+    });
 
-    if (role === "volunteer") {
-      newUser.role = "volunteer";
-      newUser.address = address;
+    if (["user", "victim", "volunteer", "ngo"].includes(role)) {
+      if (role === "ngo") {
+        newUser.role = "volunteer";
+        newUser.ngoRequest = true;
+        newUser.ngoVerified = false;
+        if (address) newUser.address = address;
+      } else {
+        newUser.role = role;
+        if (role === "volunteer") {
+          newUser.address = address;
+        }
+      }
     }
 
-    
-    const token = jwt.sign({ id: newUser._id }, process.env.SECRET, { expiresIn: "24h" });
+    const token = jwt.sign({ id: newUser._id }, process.env.SECRET, {
+      expiresIn: "24h",
+    });
     const activationUrl = `http://localhost:${port}/user/activation/${token}`;
+
+    const supportEmail = process.env.SUPPORT_EMAIL || process.env.SMTP_USER;
 
     await sendMail({
       email: newUser.email,
-      subject: "Activate your account",
-      message: `Hello ${newUser.name}, please click the link to activate your account: ${activationUrl}`,
+      subject: "Activate your EcoSphere account",
+      message: activationEmailText({
+        appName: "EcoSphere",
+        recipientName: newUser.name,
+        activationLink: activationUrl,
+        expiresInMinutes: 24 * 60,
+        supportEmail,
+      }),
+      html: activationEmailHtml({
+        appName: "EcoSphere",
+        recipientName: newUser.name,
+        activationLink: activationUrl,
+        expiresInMinutes: 24 * 60,
+        supportEmail,
+        requestIp: req.ip,
+      }),
     });
 
     await newUser.save();
-    res.status(201).json({ status: true, message: "Registration successful 👍" });
-  }));
+    res
+      .status(201)
+      .json({ status: true, message: "Registration successful 👍" });
+  })
+);
 
-
-
-
-
-
-
-  userRoute.get("/activation/:token", catchAsyncError(async (req, res, next) => {
+userRoute.get(
+  "/activation/:token",
+  catchAsyncError(async (req, res, next) => {
     const { token } = req.params;
 
     if (!token) {
       return next(new Errorhandler("Token not found 🥺", 404));
     }
 
-    
     jwt.verify(token, process.env.SECRET, async (err, decoded) => {
       if (err) return next(new Errorhandler("Invalid token ❌", 400));
 
       await volunteerModel.findByIdAndUpdate(decoded.id, { isActivated: true });
-      res.status(200).json({ status: true, message: "Activation completed 🤞" });
+      res.status(200).json({
+        status: true,
+        message: "Account activated successfully. You can now log in.",
+      });
     });
-  }));
+  })
+);
 
-
-
-
-
-
-
-
-  userRoute.post("/login", catchAsyncError(async (req, res, next) => {
+userRoute.post(
+  "/login",
+  catchAsyncError(async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -97,7 +127,9 @@ const port = process.env.PORT;
     }
 
     if (!user.isActivated) {
-      return next(new Errorhandler("Please activate your account first 🥺", 403));
+      return next(
+        new Errorhandler("Please activate your account first 🥺", 403)
+      );
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -105,111 +137,100 @@ const port = process.env.PORT;
       return next(new Errorhandler("Password is incorrect 😅", 400));
     }
 
-    
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.SECRET, { expiresIn: "24h" });
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.SECRET,
+      { expiresIn: "24h" }
+    );
 
     res.cookie("accesstoken", token, {
       httpOnly: true,
       secure: false,
-      sameSite: "lax"
+      sameSite: "lax",
     });
 
-    res.status(200).json({ status: true, message: "Login successful 👍", token });
-  }));
+    res
+      .status(200)
+      .json({ status: true, message: "Login successful 👍", token });
+  })
+);
 
-
-
-
-
-
-
-  userRoute.get("/checklogin", auth, catchAsyncError(async (req, res, next) => {
-
-
-    let userId = req.user_id
+userRoute.get(
+  "/checklogin",
+  auth,
+  catchAsyncError(async (req, res, next) => {
+    let userId = req.user_id;
     if (!userId) {
       return next(new Errorhandler("user id not found", 400));
     }
-    let user = await volunteerModel.findById(userId).select("name email role address profilePhoto");
-    res.status(200).json({ status: true, message: user })
-  }));
+    let user = await volunteerModel
+      .findById(userId)
+      .select("name email role address profilePhoto ngoVerified ngoRequest");
+    res.status(200).json({ status: true, message: user });
+  })
+);
 
+userRoute.put(
+  "/add-address",
+  auth,
+  authorization,
+  catchAsyncError(async (req, res, next) => {
+    const userId = req.user_id;
+    const { country, city, address, pincode, addressType } = req.body;
 
+    if (!country || !city || !address || !pincode || !addressType) {
+      return next(new Errorhandler("All address fields are required", 400));
+    }
 
+    const updatedUser = await volunteerModel.findByIdAndUpdate(
+      userId,
+      { $push: { address: req.body } },
+      { new: true }
+    );
 
+    res.status(200).json({ status: true, message: updatedUser });
+  })
+);
 
-
-
-
-userRoute.put("/add-address", auth, authorization, catchAsyncError(async (req, res, next) => {
-  const userId = req.user_id;
-  const { country, city, address, pincode, addressType } = req.body;
-
-
-
-
-  if (!country || !city || !address || !pincode || !addressType) {
-    return next(new Errorhandler("All address fields are required", 400));
-  }
-
-  const updatedUser = await volunteerModel.findByIdAndUpdate(
-    userId,
-    { $push: { address: req.body } },
-    { new: true }
-  );
-
-
-
-  res.status(200).json({ status: true, message: updatedUser });
-}));
-
-
-
-
-
-
-  userRoute.post("/upload", auth, upload.single("photo"), catchAsyncError(async (req, res, next) => {
-  
-  
-
+userRoute.post(
+  "/upload",
+  auth,
+  upload.single("photo"),
+  catchAsyncError(async (req, res, next) => {
     if (!req.file) {
-      return next(new Errorhandler("File not found", 400))
+      return next(new Errorhandler("File not found", 400));
     }
 
-
-    const userId = req.user_id
+    const userId = req.user_id;
     if (!userId) {
-      return next(new Errorhandler("userId not found", 400))
+      return next(new Errorhandler("userId not found", 400));
     }
 
-    
-    const fileName = path.basename(req.file.path)
-    let updated = await volunteerModel.findByIdAndUpdate(userId, { profilePhoto: fileName }, { new: true })
-    res.status(200).json({ message: updated })
+    const fileName = path.basename(req.file.path);
+    let updated = await volunteerModel.findByIdAndUpdate(
+      userId,
+      { profilePhoto: fileName },
+      { new: true }
+    );
+    res.status(200).json({ message: updated });
+  })
+);
 
-
-  }))
-
-
-
-
-
-  userRoute.get("/logout", catchAsyncError(async (req, res, next) => {
+userRoute.get(
+  "/logout",
+  catchAsyncError(async (req, res, next) => {
     res.clearCookie("accesstoken", {
       httpOnly: true,
       secure: false,
-      sameSite: "lax"
+      sameSite: "lax",
     });
 
     res.status(200).json({
       status: true,
-      message: "Logout successful 👋"
+      message: "Logout successful 👋",
     });
-  }));
-
-
-
-
+  })
+);
 
 const googleAuthCallback = async (req, res) => {
   try {
@@ -217,14 +238,13 @@ const googleAuthCallback = async (req, res) => {
 
     const { displayName, emails } = profile;
     if (!emails || emails.length === 0) {
-      return res.status(400).json({ message: 'Email is required for authentication' });
+      return res
+        .status(400)
+        .json({ message: "Email is required for authentication" });
     }
-
 
     const email = emails[0].value;
     const name = displayName;
-
-    
 
     let existingUser = await volunteerModel.findOne({ email });
     if (!existingUser) {
@@ -232,15 +252,17 @@ const googleAuthCallback = async (req, res) => {
         name,
         email,
         password: null,
-        role: 'user' ,
+        role: "user",
         isActivated: true,
       });
       await existingUser.save();
     }
 
-
-   
-    const token = jwt.sign({ id: existingUser._id, role: existingUser.role }, process.env.SECRET, { expiresIn: "24h" });
+    const token = jwt.sign(
+      { id: existingUser._id, role: existingUser.role },
+      process.env.SECRET,
+      { expiresIn: "24h" }
+    );
 
     res.cookie("accesstoken", token, {
       httpOnly: true,
@@ -249,30 +271,32 @@ const googleAuthCallback = async (req, res) => {
     });
 
     res.redirect(`http://localhost:5173/google-success?token=${token}`);
-
   } catch (err) {
     console.error("Google Auth Error:", err);
-    res.status(500).json({ message: "Failed to authenticate with Google", error: err.message });
+    res.status(500).json({
+      message: "Failed to authenticate with Google",
+      error: err.message,
+    });
   }
 };
 
+userRoute.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
 
+userRoute.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    session: false,
+    failureRedirect: "http://localhost:5173/login",
+  }),
 
-
-  userRoute.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
-
-
-  userRoute.get(
-    "/google/callback",
-    passport.authenticate("google", { session: false, failureRedirect: "http://localhost:5173/login" }),
-
-    (req, res, next) => {
-    
-      console.log("User object:", req.user);
-      next();
-    },
-    googleAuthCallback
-  );
-
+  (req, res, next) => {
+    console.log("User object:", req.user);
+    next();
+  },
+  googleAuthCallback
+);
 
 module.exports = { userRoute };

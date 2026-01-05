@@ -8,7 +8,7 @@ function Signup() {
   const [hide, setHide] = useState(true);
   const [hided, setHided] = useState(true);
   const [err, setErr] = useState("");
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -52,7 +52,10 @@ function Signup() {
 
     if (
       role === "volunteer" &&
-      (!address.country || !address.city || !address.address || !address.pincode)
+      (!address.country ||
+        !address.city ||
+        !address.address ||
+        !address.pincode)
     ) {
       setErr("Please fill all address fields for volunteer role");
       setLoading(false);
@@ -76,7 +79,6 @@ function Signup() {
 
       await axios.post("http://localhost:4567/user/signup", payload);
 
-      
       setTimeout(() => {
         navigate("/Login");
       }, 1000);
@@ -101,13 +103,13 @@ function Signup() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4"
+      className="min-h-screen flex items-center justify-center page-wrap bg-transparent px-4"
     >
       <motion.div
         variants={fadeIn}
         initial="hidden"
         animate="visible"
-        className="w-full max-w-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl shadow-2xl p-8"
+        className="w-full max-w-md glass-card text-gray-900 dark:text-gray-700 rounded-2xl p-8"
       >
         <motion.h1
           variants={fadeIn}
@@ -116,7 +118,10 @@ function Signup() {
           Create an Account
         </motion.h1>
 
-        {[{ label: "Name", name: "name", type: "text" }, { label: "Email Address", name: "email", type: "email" }].map((field, i) => (
+        {[
+          { label: "Name", name: "name", type: "text" },
+          { label: "Email Address", name: "email", type: "email" },
+        ].map((field, i) => (
           <motion.div key={field.name} custom={i} variants={fadeIn}>
             <label className="block text-sm font-medium">{field.label}</label>
             <input
@@ -124,7 +129,7 @@ function Signup() {
               name={field.name}
               value={data[field.name]}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 mb-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="glass-input w-full mb-4"
             />
           </motion.div>
         ))}
@@ -135,28 +140,32 @@ function Signup() {
             name="role"
             value={data.role}
             onChange={handleInputChange}
-            className="w-full px-4 py-2 mb-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="glass-input w-full mb-4"
           >
-            <option value="user">User</option>
+            <option value="user">Victim (User)</option>
+            <option value="victim">Victim</option>
             <option value="volunteer">Volunteer</option>
+            <option value="ngo">NGO</option>
           </select>
         </motion.div>
 
         {data.role === "volunteer" &&
-          ["country", "city", "address", "pincode", "area", "addressType"].map((field, i) => (
-            <motion.div key={field} custom={i + 2} variants={fadeIn}>
-              <label className="block text-sm font-medium capitalize">
-                {field.replace(/([A-Z])/g, " $1")}
-              </label>
-              <input
-                type="text"
-                name={field}
-                value={data.address[field]}
-                onChange={handleAddressChange}
-                className="w-full px-4 py-2 mb-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </motion.div>
-          ))}
+          ["country", "city", "address", "pincode", "area", "addressType"].map(
+            (field, i) => (
+              <motion.div key={field} custom={i + 2} variants={fadeIn}>
+                <label className="block text-sm font-medium capitalize">
+                  {field.replace(/([A-Z])/g, " $1")}
+                </label>
+                <input
+                  type="text"
+                  name={field}
+                  value={data.address[field]}
+                  onChange={handleAddressChange}
+                  className="glass-input w-full mb-4"
+                />
+              </motion.div>
+            )
+          )}
 
         <motion.div variants={fadeIn}>
           <label className="block text-sm font-medium">Password</label>
@@ -166,10 +175,10 @@ function Signup() {
               name="password"
               value={data.password}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="glass-input w-full pr-10 mb-4"
             />
             <span
-              className="absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-300 cursor-pointer"
+              className="absolute inset-y-0 right-3 flex items-center text-gray-900 dark:text-gray-700 cursor-pointer"
               onClick={toggleHide}
             >
               {hide ? <FaRegEye /> : <FaRegEyeSlash />}
@@ -185,10 +194,10 @@ function Signup() {
               name="confirmpass"
               value={data.confirmpass}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="glass-input w-full pr-10 mb-4"
             />
             <span
-              className="absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-300 cursor-pointer"
+              className="absolute inset-y-0 right-3 flex items-center text-gray-900 dark:text-gray-700 cursor-pointer"
               onClick={toggleHided}
             >
               {hided ? <FaRegEye /> : <FaRegEyeSlash />}
@@ -210,7 +219,9 @@ function Signup() {
           whileHover={!loading && { scale: 1.05 }}
           whileTap={!loading && { scale: 0.95 }}
           disabled={loading}
-          className={`w-full ${loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"} text-white font-medium py-2 rounded-md transition duration-300`}
+          className={`w-full glass-btn ${
+            loading ? "opacity-60 cursor-not-allowed" : ""
+          }`}
           onClick={handleSubmit}
         >
           {loading ? "Signing up..." : "Signup"}

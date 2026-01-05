@@ -1,34 +1,29 @@
 const mongoose = require("mongoose");
 
-
-
 const addressSchema = new mongoose.Schema({
   country: {
     type: String,
-    required: true
+    required: true,
   },
   city: {
     type: String,
-    required: true
+    required: true,
   },
   address: {
     type: String,
-    required: true
+    required: true,
   },
   pincode: {
     type: Number,
-    required: true
+    required: true,
   },
   area: {
-    type: String
+    type: String,
   },
   addressType: {
-    type: String
-  }
+    type: String,
+  },
 });
-
-
-
 
 const VolunteerSchema = new mongoose.Schema({
   name: {
@@ -37,7 +32,7 @@ const VolunteerSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: true
+    required: true,
   },
   password: {
     type: String,
@@ -46,51 +41,69 @@ const VolunteerSchema = new mongoose.Schema({
   role: {
     type: String,
     default: "user",
-    enum: ["user", "volunteer", "admin"]
+    enum: ["user", "victim", "volunteer", "ngo", "admin"],
   },
   address: [{ type: addressSchema }],
   isActivated: {
     type: Boolean,
-    default: false
+    default: false,
   },
-   profilePhoto: {
-     type: String 
-    },
+  ngoVerified: {
+    type: Boolean,
+    default: false,
+  },
+  ngoRequest: {
+    type: Boolean,
+    default: false,
+    index: true,
+  },
+  ngoId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "volunteer",
+    index: true,
+  },
+  profilePhoto: {
+    type: String,
+  },
   tasks: [
     {
+      taskType: {
+        type: String,
+        enum: ["assistance", "incident", "other"],
+        default: "other",
+      },
+      refId: {
+        type: mongoose.Schema.Types.ObjectId,
+        index: true,
+      },
       title: String,
-      completed: { type: Boolean, default: false }
-    }
+      completed: { type: Boolean, default: false },
+    },
   ],
 
   assignedEvents: [
     {
-      type: String
-      
-    }
+      type: String,
+    },
   ],
 
   hoursLogged: {
     type: Number,
-    default: 0
+    default: 0,
   },
 
   profile: {
     age: Number,
     phone: String,
-    address: String
+    address: String,
   },
 
   achievements: [
     {
-      type: String
-      
-    }
-  ]
+      type: String,
+    },
+  ],
 });
-
-
-
 
 const volunteerModel = mongoose.model("volunteer", VolunteerSchema);
 

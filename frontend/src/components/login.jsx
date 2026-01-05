@@ -47,12 +47,12 @@ function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 px-4 transition-colors">
+    <div className="flex items-center justify-center min-h-screen page-wrap bg-transparent px-4 transition-colors">
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: -30 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl shadow-2xl p-8 transition-colors"
+        className="w-full max-w-md glass-card text-gray-900 dark:text-gray-700 rounded-2xl p-8 transition-colors"
       >
         <div className="flex justify-between items-center mb-6">
           <motion.h1
@@ -86,7 +86,7 @@ function Login() {
             type="email"
             name="email"
             onChange={handleForm}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="glass-input w-full"
           />
         </div>
 
@@ -97,12 +97,12 @@ function Login() {
               type={hide ? "password" : "text"}
               name="password"
               onChange={handleForm}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="glass-input w-full pr-10"
             />
             <motion.span
               whileTap={{ scale: 1.3 }}
               whileHover={{ scale: 1.2 }}
-              className="absolute top-2.5 right-3 text-gray-500 dark:text-gray-300 cursor-pointer"
+              className="absolute top-2.5 right-3 text-gray-900 dark:text-gray-700 cursor-pointer"
               onClick={handleHide}
             >
               {hide ? <FaRegEye /> : <FaRegEyeSlash />}
@@ -115,8 +115,10 @@ function Login() {
             <input type="checkbox" className="form-checkbox rounded" />
             <span>Remember me</span>
           </label>
-          <button onClick={() => navigate("/Otp")}
-           className="text-blue-600 dark:text-blue-400 hover:underline">
+          <button
+            onClick={() => navigate("/Otp")}
+            className="text-blue-600 dark:text-blue-400 hover:underline"
+          >
             Forgot password?
           </button>
         </div>
@@ -125,9 +127,9 @@ function Login() {
           whileHover={!loading && { scale: 1.05 }}
           whileTap={!loading && { scale: 0.95 }}
           disabled={loading}
-          className={`w-full ${
-            loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
-          } text-white font-medium py-2 rounded-md transition duration-300`}
+          className={`w-full glass-btn ${
+            loading ? "opacity-60 cursor-not-allowed" : ""
+          }`}
           onClick={handleSubmit}
         >
           {loading ? "Logging in..." : "Login"}
@@ -135,7 +137,7 @@ function Login() {
 
         <div className="text-center text-sm mt-6 space-y-4">
           <div className="flex justify-center items-center space-x-2">
-            <span className="text-gray-700 dark:text-gray-300">
+            <span className="text-gray-700 dark:text-gray-500">
               Don't have an account?
             </span>
             <button
@@ -147,8 +149,8 @@ function Login() {
           </div>
 
           <hr className="my-4 border-t-2 border-gray-300 dark:border-gray-600" />
-          
-          <GoogleButton/>
+
+          <GoogleButton />
         </div>
       </motion.div>
     </div>

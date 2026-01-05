@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520" fill="none">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6366F1" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#A855F7" stop-opacity="0.22"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6366F1"/>
+      <stop offset="1" stop-color="#A855F7"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="24" y="24" width="852" height="472" rx="40" fill="url(#g1)"/>
+  <rect x="70" y="88" width="440" height="26" rx="13" fill="url(#g2)" opacity="0.85"/>
+  <rect x="70" y="134" width="320" height="18" rx="9" fill="#111827" opacity="0.18"/>
+  <rect x="70" y="164" width="360" height="18" rx="9" fill="#111827" opacity="0.12"/>
+
+  <g transform="translate(560,120)">
+    <path d="M140 210c60-42 112-98 112-156 0-32-20-54-52-54-24 0-43 14-60 36-17-22-36-36-60-36-32 0-52 22-52 54 0 58 52 114 112 156z" fill="#EF4444" opacity="0.92"/>
+    <path d="M140 192c52-36 96-82 96-132 0-22-14-38-36-38-19 0-34 11-44 27-10-16-25-27-44-27-22 0-36 16-36 38 0 50 44 96 96 132z" fill="#FCA5A5" opacity="0.65"/>
+    <circle cx="40" cy="34" r="10" fill="#6366F1" opacity="0.45"/>
+    <circle cx="258" cy="42" r="14" fill="#A855F7" opacity="0.35"/>
+    <circle cx="274" cy="220" r="10" fill="#6366F1" opacity="0.3"/>
+  </g>
+</svg>

@@ -49,7 +49,10 @@ const Data = () => {
         const time = new Date();
         time.setHours(hour, 0, 0, 0);
         return {
-          name: time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          name: time.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
           AQI: 30 + Math.floor(Math.random() * 10),
         };
       });
@@ -101,7 +104,16 @@ const Data = () => {
     setTimeRange(e.target.value);
   };
 
-  const cardBase = darkMode ? "bg-gray-700 text-white" : "bg-white text-gray-900";
+  const cardBase = `${
+    darkMode ? "bg-neutral-800 text-white" : "bg-white text-gray-900"
+  } p-6 rounded-lg shadow-lg`;
+
+  const aqiColorClass = (aqi) =>
+    aqi < 50
+      ? "text-green-500"
+      : aqi < 100
+      ? "text-yellow-400"
+      : "text-red-500";
 
   const greeting = () => {
     const hour = new Date().getHours();
@@ -117,7 +129,13 @@ const Data = () => {
   };
 
   return (
-    <div className={darkMode ? "min-h-screen bg-gray-900 text-white" : "min-h-screen bg-gray-50 text-gray-900"}>
+    <div
+      className={
+        darkMode
+          ? "min-h-screen bg-gray-900 text-white"
+          : "min-h-screen bg-gray-50 text-gray-900"
+      }
+    >
       <header className="flex justify-between items-center p-6">
         <h1 className="text-2xl font-extrabold">Welcome to EcoSphere</h1>
         <motion.button
@@ -134,37 +152,78 @@ const Data = () => {
         <h2 className="text-xl font-medium mb-2">{greeting()}, Jayanth! 🌿</h2>
         <p className="mb-4 italic text-sm text-green-600">{tips[tipIndex]}</p>
         {loading ? (
-          <div className="flex justify-center items-center">
-            <div className="spinner-border animate-spin"></div>
-            <p>Loading metrics...</p>
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+            <p className="text-gray-600">Loading metrics...</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`${cardBase} p-6 rounded-lg shadow-lg`}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className={`glass-card ${
+                darkMode
+                  ? "bg-neutral-800 text-white"
+                  : "bg-white text-gray-900"
+              } p-6 rounded-lg`}
+            >
               <h3 className="text-xl font-semibold">Air Quality</h3>
-              <p className="text-sm mt-1">Status: <span className="font-semibold">{statusLabel(metrics.airQuality)}</span></p>
-              <div className="mt-2 text-center text-4xl font-bold" style={{
-                color: metrics.airQuality < 50 ? '#22c55e' : metrics.airQuality < 100 ? '#facc15' : '#ef4444'
-              }}>
+              <p className="text-sm mt-1">
+                Status:{" "}
+                <span className="font-semibold">
+                  {statusLabel(metrics.airQuality)}
+                </span>
+              </p>
+              <div
+                className={`mt-2 text-center text-4xl font-bold ${aqiColorClass(
+                  metrics.airQuality
+                )}`}
+              >
                 {metrics.airQuality} AQI
               </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`${cardBase} p-6 rounded-lg shadow-lg`}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className={`glass-card ${
+                darkMode
+                  ? "bg-neutral-800 text-white"
+                  : "bg-white text-gray-900"
+              } p-6 rounded-lg`}
+            >
               <h3 className="text-xl font-semibold">Water Quality</h3>
-              <div className="mt-2 text-center text-4xl font-bold text-blue-400">
+              <div className="mt-2 text-center text-4xl font-bold text-sky-500">
                 {metrics.waterQuality}%
               </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`${cardBase} p-6 rounded-lg shadow-lg`}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className={`glass-card ${
+                darkMode
+                  ? "bg-neutral-800 text-white"
+                  : "bg-white text-gray-900"
+              } p-6 rounded-lg`}
+            >
               <h3 className="text-xl font-semibold">Waste Levels</h3>
-              <div className="mt-2 text-center text-4xl font-bold">{metrics.wasteLevels}</div>
+              <div className="mt-2 text-center text-4xl font-bold text-gray-700">
+                {metrics.wasteLevels}
+              </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`${cardBase} p-6 rounded-lg shadow-lg`}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className={`glass-card ${
+                darkMode
+                  ? "bg-neutral-800 text-white"
+                  : "bg-white text-gray-900"
+              } p-6 rounded-lg`}
+            >
               <h3 className="text-xl font-semibold">Energy Usage</h3>
-              <div className="mt-2 text-center text-4xl font-bold text-green-400">
+              <div className="mt-2 text-center text-4xl font-bold text-emerald-400">
                 {metrics.energyUsage}
               </div>
             </motion.div>
@@ -189,8 +248,13 @@ const Data = () => {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
             <YAxis />
-            <Tooltip  />
-            <Line type="monotone" dataKey="AQI" stroke="#8884d8"  activeDot={{ r: 8 }} />
+            <Tooltip />
+            <Line
+              type="monotone"
+              dataKey="AQI"
+              stroke="#8884d8"
+              activeDot={{ r: 8 }}
+            />
           </LineChart>
         </ResponsiveContainer>
       </section>
@@ -207,18 +271,26 @@ const Data = () => {
               className={`${cardBase} p-8 rounded-lg shadow-lg`}
             >
               <div className="text-3xl mb-4">{icon}</div>
-              <h3 className="text-2xl font-semibold mb-4">{[
-                "Plant a Tree",
-                "Disaster Tips",
-                "Water Saving Tips",
-                "Eco-Friendly Lifestyle",
-              ][index]}</h3>
-              <p>{[
-                "Understand the benefits of planting a tree and learn the best practices for growing one.",
-                "Get prepared for emergencies with expert advice on how to protect yourself and your loved ones.",
-                "Explore practical and sustainable ways to conserve water in your daily life.",
-                "Learn how to reduce your carbon footprint and live more sustainably through easy lifestyle changes.",
-              ][index]}</p>
+              <h3 className="text-2xl font-semibold mb-4">
+                {
+                  [
+                    "Plant a Tree",
+                    "Disaster Tips",
+                    "Water Saving Tips",
+                    "Eco-Friendly Lifestyle",
+                  ][index]
+                }
+              </h3>
+              <p>
+                {
+                  [
+                    "Understand the benefits of planting a tree and learn the best practices for growing one.",
+                    "Get prepared for emergencies with expert advice on how to protect yourself and your loved ones.",
+                    "Explore practical and sustainable ways to conserve water in your daily life.",
+                    "Learn how to reduce your carbon footprint and live more sustainably through easy lifestyle changes.",
+                  ][index]
+                }
+              </p>
             </motion.div>
           ))}
         </div>
@@ -228,9 +300,15 @@ const Data = () => {
         <div className="text-center">
           <p>&copy; 2025 EcoSphere. All rights reserved.</p>
           <div className="mt-2">
-            <a href="#" className="text-blue-400 hover:underline mr-4">About Us</a>
-            <a href="#" className="text-blue-400 hover:underline mr-4">Contact</a>
-            <a href="#" className="text-blue-400 hover:underline">Privacy Policy</a>
+            <a href="#" className="text-blue-400 hover:underline mr-4">
+              About Us
+            </a>
+            <a href="#" className="text-blue-400 hover:underline mr-4">
+              Contact
+            </a>
+            <a href="#" className="text-blue-400 hover:underline">
+              Privacy Policy
+            </a>
           </div>
         </div>
       </footer>
