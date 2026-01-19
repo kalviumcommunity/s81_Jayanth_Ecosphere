@@ -20,9 +20,23 @@ app.use(express.json());
 
 app.use(passport.initialize());
 
+const allowedOrigins = String(
+  process.env.CORS_ORIGIN ||
+    process.env.FRONTEND_BASE_URL ||
+    "http://localhost:5173"
+)
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: (origin, cb) => {
+      // Allow non-browser clients (no Origin header)
+      if (!origin) return cb(null, true);
+      if (allowedOrigins.includes(origin)) return cb(null, true);
+      return cb(new Error(`CORS blocked for origin: ${origin}`));
+    },
     credentials: true,
     allowedHeaders: [
       "Content-Type",
@@ -30,6 +44,7 @@ app.use(
       "X-Requested-With",
       "Accept",
     ],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   })
 );
 app.use(cookieparser());

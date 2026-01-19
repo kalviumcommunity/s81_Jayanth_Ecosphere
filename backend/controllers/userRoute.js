@@ -18,6 +18,20 @@ const passport = require("passport");
 require("dotenv").config();
 
 const userRoute = express.Router();
+
+function getFrontendBaseUrl() {
+  return process.env.FRONTEND_BASE_URL || "http://localhost:5173";
+}
+
+function getAuthCookieOptions() {
+  const base = getFrontendBaseUrl();
+  const isHttps = base.startsWith("https://");
+  return {
+    httpOnly: true,
+    secure: isHttps,
+    sameSite: isHttps ? "none" : "lax",
+  };
+}
 const port = process.env.PORT;
 
 userRoute.post(
@@ -144,9 +158,7 @@ userRoute.post(
     );
 
     res.cookie("accesstoken", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      ...getAuthCookieOptions(),
     });
 
     res
@@ -220,9 +232,7 @@ userRoute.get(
   "/logout",
   catchAsyncError(async (req, res, next) => {
     res.clearCookie("accesstoken", {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      ...getAuthCookieOptions(),
     });
 
     res.status(200).json({
@@ -265,12 +275,10 @@ const googleAuthCallback = async (req, res) => {
     );
 
     res.cookie("accesstoken", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      ...getAuthCookieOptions(),
     });
 
-    res.redirect(`http://localhost:5173/google-success?token=${token}`);
+    res.redirect(`${getFrontendBaseUrl()}/google-success?token=${token}`);
   } catch (err) {
     console.error("Google Auth Error:", err);
     res.status(500).json({
@@ -289,7 +297,7 @@ userRoute.get(
   "/google/callback",
   passport.authenticate("google", {
     session: false,
-    failureRedirect: "http://localhost:5173/login",
+    failureRedirect: `${getFrontendBaseUrl()}/login`,
   }),
 
   (req, res, next) => {

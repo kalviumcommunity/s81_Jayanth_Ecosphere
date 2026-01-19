@@ -1,6 +1,7 @@
 const express = require("express");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
+const mongoose = require("mongoose");
 const catchAsyncError = require("../middleware/catchAsyncError");
 const Errorhandler = require("../utils/Errorhandler");
 const { auth, requireRoles } = require("../middleware/auth");
@@ -31,6 +32,10 @@ donationRoute.post(
   auth,
   requireRoles("user", "victim", "volunteer", "ngo", "admin"),
   catchAsyncError(async (req, res, next) => {
+    if (!mongoose.Types.ObjectId.isValid(String(req.user_id))) {
+      return next(new Errorhandler("Invalid session. Please login again.", 401));
+    }
+
     const razorpay = getRazorpay();
     if (!razorpay)
       return next(new Errorhandler("Razorpay is not configured", 500));
@@ -71,17 +76,24 @@ donationRoute.post(
       ngoId: ngo?._id,
     });
 
-    const order = await razorpay.orders.create({
-      amount: amountInr * 100,
-      currency: "INR",
-      receipt: String(created._id),
-      notes: {
-        donationId: String(created._id),
-        itemKey: String(itemKey),
-        itemName: String(itemName),
-        donorEmail: String(me.email),
-      },
-    });
+    let order;
+    try {
+      order = await razorpay.orders.create({
+        amount: amountInr * 100,
+        currency: "INR",
+        receipt: String(created._id),
+        notes: {
+          donationId: String(created._id),
+          itemKey: String(itemKey),
+          itemName: String(itemName),
+          donorEmail: String(me.email),
+        },
+      });
+    } catch (e) {
+      // Avoid leaving orphaned "created" donation if order creation fails
+      await donationModel.findByIdAndDelete(created._id).catch(() => {});
+      return next(e);
+    }
 
     created.razorpayOrderId = order.id;
     await created.save();
@@ -108,6 +120,10 @@ donationRoute.post(
   auth,
   requireRoles("user", "victim", "volunteer", "ngo", "admin"),
   catchAsyncError(async (req, res, next) => {
+    if (!mongoose.Types.ObjectId.isValid(String(req.user_id))) {
+      return next(new Errorhandler("Invalid session. Please login again.", 401));
+    }
+
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
     if (!keySecret)
       return next(new Errorhandler("Razorpay is not configured", 500));
@@ -184,6 +200,10 @@ donationRoute.get(
   auth,
   requireRoles("user", "victim", "volunteer", "ngo", "admin"),
   catchAsyncError(async (req, res, next) => {
+    if (!mongoose.Types.ObjectId.isValid(String(req.user_id))) {
+      return next(new Errorhandler("Invalid session. Please login again.", 401));
+    }
+
     const { donation_id, order_id } = req.query;
 
     if (!donation_id && !order_id)
