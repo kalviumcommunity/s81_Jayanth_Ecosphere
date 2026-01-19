@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 export default function NGOVolunteerAssign() {
   const { user, loading: authLoading } = useAuth();
@@ -25,10 +26,10 @@ export default function NGOVolunteerAssign() {
     setSuccess("");
     try {
       const [vRes, iRes] = await Promise.all([
-        axios.get("http://localhost:4567/incidents/ngo/volunteers", {
+        axios.get(buildBackendUrl("/incidents/ngo/volunteers"), {
           withCredentials: true,
         }),
-        axios.get("http://localhost:4567/incidents/ngo/my", {
+        axios.get(buildBackendUrl("/incidents/ngo/my"), {
           withCredentials: true,
         }),
       ]);
@@ -72,7 +73,7 @@ export default function NGOVolunteerAssign() {
     setBusyVolunteerId(volunteerId);
     try {
       await axios.post(
-        `http://localhost:4567/incidents/${selectedIncidentId}/request-volunteer`,
+        buildBackendUrl(`/incidents/${selectedIncidentId}/request-volunteer`),
         { volunteerId },
         { withCredentials: true }
       );

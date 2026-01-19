@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 export default function AdminNGOVerify() {
   const { user, loading } = useAuth();
@@ -9,7 +10,7 @@ export default function AdminNGOVerify() {
   const [busyId, setBusyId] = useState(null);
 
   const load = async () => {
-    const res = await axios.get("http://localhost:4567/admin/ngos", {
+    const res = await axios.get(buildBackendUrl("/admin/ngos"), {
       withCredentials: true,
     });
     setItems(res.data?.data || []);
@@ -30,7 +31,7 @@ export default function AdminNGOVerify() {
     setBusyId(id);
     try {
       await axios.patch(
-        `http://localhost:4567/admin/ngos/${id}/verify`,
+        buildBackendUrl(`/admin/ngos/${id}/verify`),
         {},
         { withCredentials: true }
       );

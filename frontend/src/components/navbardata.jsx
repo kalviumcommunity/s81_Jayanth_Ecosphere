@@ -4,6 +4,7 @@ import { CgProfile } from "react-icons/cg";
 import { FiMenu, FiX } from "react-icons/fi";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 // Simplified, modern site title with gradient accent (no background images)
 const SiteTitle = () => (
@@ -22,12 +23,9 @@ const Navbarpage = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:4567/user/checklogin",
-          {
-            withCredentials: true,
-          }
-        );
+        const response = await axios.get(buildBackendUrl("/user/checklogin"), {
+          withCredentials: true,
+        });
 
         const fetchedUser = response.data?.message || null;
         setUser(fetchedUser);
@@ -67,7 +65,7 @@ const Navbarpage = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.get("http://localhost:4567/user/logout", {
+      const response = await axios.get(buildBackendUrl("/user/logout"), {
         withCredentials: true,
       });
       if (response.status === 200) {

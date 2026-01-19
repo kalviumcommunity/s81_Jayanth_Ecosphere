@@ -4,6 +4,7 @@ import ChatSlide from "./ChatSlide";
 import VolunteerList from "./VolunteerList";
 import UserList from "./UserList";
 import socket from "../store/socket";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 const ChatPage = () => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -14,7 +15,7 @@ const ChatPage = () => {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const res = await axios.get("http://localhost:4567/user/checklogin", {
+        const res = await axios.get(buildBackendUrl("/user/checklogin"), {
           withCredentials: true,
         });
 

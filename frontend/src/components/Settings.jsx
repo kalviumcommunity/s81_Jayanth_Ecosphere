@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -32,14 +33,14 @@ const Settings = () => {
     let mounted = true;
     (async () => {
       try {
-        const res = await axios.get("http://localhost:4567/user/profile", {
+        const res = await axios.get(buildBackendUrl("/user/profile"), {
           withCredentials: true,
         });
         if (!mounted) return;
         setEmail(res.data?.message?.email || "");
         setPhotoPreview(
           res.data?.message?.profilePhoto
-            ? `http://localhost:4567/profile-photo/${res.data.message.profilePhoto}`
+            ? buildBackendUrl(`/profile-photo/${res.data.message.profilePhoto}`)
             : ""
         );
       } catch (err) {
@@ -56,7 +57,7 @@ const Settings = () => {
     setSuccess("");
     try {
       await axios.post(
-        "http://localhost:4567/user/settings",
+        buildBackendUrl("/user/settings"),
         { email, notifications },
         { withCredentials: true }
       );
@@ -80,7 +81,7 @@ const Settings = () => {
     setPasswordLoading(true);
     try {
       await axios.post(
-        "http://localhost:4567/user/change-password",
+        buildBackendUrl("/user/change-password"),
         { currentPassword, newPassword },
         { withCredentials: true }
       );
@@ -113,7 +114,7 @@ const Settings = () => {
     const form = new FormData();
     form.append("photo", photoFile);
     try {
-      const res = await axios.post("http://localhost:4567/user/upload", form, {
+      const res = await axios.post(buildBackendUrl("/user/upload"), form, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -122,7 +123,7 @@ const Settings = () => {
       // set returned preview if available
       if (res.data?.message?.profilePhoto) {
         setPhotoPreview(
-          `http://localhost:4567/profile-photo/${res.data.message.profilePhoto}`
+          buildBackendUrl(`/profile-photo/${res.data.message.profilePhoto}`)
         );
       }
     } catch (err) {
@@ -138,7 +139,7 @@ const Settings = () => {
     setDeleteMsg("");
     try {
       await axios.post(
-        "http://localhost:4567/user/delete",
+        buildBackendUrl("/user/delete"),
         {},
         { withCredentials: true }
       );

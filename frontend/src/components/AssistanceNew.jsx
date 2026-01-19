@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 export default function AssistanceNew() {
   const { user, loading } = useAuth();
@@ -19,7 +20,7 @@ export default function AssistanceNew() {
     setSaving(true);
     try {
       await axios.post(
-        "http://localhost:4567/assist/requests",
+        buildBackendUrl("/assist/requests"),
         {
           title,
           category,

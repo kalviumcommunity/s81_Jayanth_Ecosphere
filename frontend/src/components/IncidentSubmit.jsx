@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 export default function IncidentSubmit() {
   const [title, setTitle] = useState("");
@@ -23,7 +24,7 @@ export default function IncidentSubmit() {
       fd.append("locationText", locationText);
       for (const f of files) fd.append("media", f);
 
-      await axios.post("http://localhost:4567/incidents/submit", fd, {
+      await axios.post(buildBackendUrl("/incidents/submit"), fd, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" },
       });

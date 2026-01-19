@@ -1,6 +1,7 @@
 // Example useAuth.js
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 const useAuth = () => {
   const [user, setUser] = useState(null);
@@ -8,7 +9,7 @@ const useAuth = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:4567/user/checklogin", { withCredentials: true })
+      .get(buildBackendUrl("/user/checklogin"), { withCredentials: true })
       .then((res) => {
         setUser(res.data?.message || null);
       })

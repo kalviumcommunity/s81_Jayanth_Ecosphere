@@ -15,7 +15,12 @@ const donationSchema = new mongoose.Schema(
     itemName: { type: String, required: true },
     amountInr: { type: Number, required: true },
 
-    paymentProvider: { type: String, enum: ["stripe"], default: "stripe" },
+    paymentProvider: {
+      type: String,
+      enum: ["razorpay", "stripe"],
+      default: "razorpay",
+      index: true,
+    },
     paymentStatus: {
       type: String,
       enum: ["created", "paid", "failed"],
@@ -23,8 +28,14 @@ const donationSchema = new mongoose.Schema(
       index: true,
     },
 
+    // Legacy Stripe fields (kept to avoid breaking existing records)
     stripeSessionId: { type: String, index: true },
     stripePaymentIntentId: { type: String },
+
+    // Razorpay fields
+    razorpayOrderId: { type: String, index: true },
+    razorpayPaymentId: { type: String },
+    razorpaySignature: { type: String },
     transactionId: { type: String },
 
     ngoId: { type: mongoose.Schema.Types.ObjectId, ref: "volunteer" },

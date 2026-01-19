@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ClipLoader from "react-spinners/ClipLoader";
 import useAuth from "../hooks/useAuth";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 const Volenteer = () => {
   const { user, loading: authLoading } = useAuth();
@@ -25,12 +26,9 @@ const Volenteer = () => {
     setLoading(true);
     setError("");
     try {
-      const response = await axios.get(
-        "http://localhost:4567/volen/volunteer",
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await axios.get(buildBackendUrl("/volen/volunteer"), {
+        withCredentials: true,
+      });
       if (response.status === 200) {
         setData(response.data);
       }
@@ -49,7 +47,7 @@ const Volenteer = () => {
   const loadMyTasks = async () => {
     setTaskError("");
     try {
-      const res = await axios.get("http://localhost:4567/assist/pending", {
+      const res = await axios.get(buildBackendUrl("/assist/pending"), {
         withCredentials: true,
       });
       const all = res.data?.data || [];
@@ -69,7 +67,7 @@ const Volenteer = () => {
     setTaskBusyId(id);
     try {
       await axios.patch(
-        `http://localhost:4567/assist/requests/${id}/status`,
+        buildBackendUrl(`/assist/requests/${id}/status`),
         { status },
         { withCredentials: true }
       );
@@ -85,12 +83,9 @@ const Volenteer = () => {
   const loadMyIncidentTasks = async () => {
     setIncidentError("");
     try {
-      const res = await axios.get(
-        "http://localhost:4567/incidents/volunteer/my",
-        {
-          withCredentials: true,
-        }
-      );
+      const res = await axios.get(buildBackendUrl("/incidents/volunteer/my"), {
+        withCredentials: true,
+      });
       setIncidentTasks(res.data?.data || []);
     } catch (e) {
       setIncidentError(
@@ -104,7 +99,7 @@ const Volenteer = () => {
     setRequestError("");
     try {
       const res = await axios.get(
-        "http://localhost:4567/incidents/volunteer/requests",
+        buildBackendUrl("/incidents/volunteer/requests"),
         { withCredentials: true }
       );
       setIncidentRequests(res.data?.data || []);
@@ -121,7 +116,7 @@ const Volenteer = () => {
     setRequestError("");
     try {
       await axios.patch(
-        `http://localhost:4567/incidents/${incidentId}/volunteer/request`,
+        buildBackendUrl(`/incidents/${incidentId}/volunteer/request`),
         { action },
         { withCredentials: true }
       );
@@ -139,7 +134,7 @@ const Volenteer = () => {
     setIncidentBusyId(id);
     try {
       await axios.patch(
-        `http://localhost:4567/incidents/${id}/volunteer/status`,
+        buildBackendUrl(`/incidents/${id}/volunteer/status`),
         { responseStatus: "resolved" },
         { withCredentials: true }
       );

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 export default function IncidentFeed() {
   const { user } = useAuth();
@@ -20,10 +21,10 @@ export default function IncidentFeed() {
     const run = async () => {
       try {
         const res = isUserReporter
-          ? await axios.get("http://localhost:4567/incidents/my", {
+          ? await axios.get(buildBackendUrl("/incidents/my"), {
               withCredentials: true,
             })
-          : await axios.get("http://localhost:4567/incidents/feed");
+          : await axios.get(buildBackendUrl("/incidents/feed"));
         setItems(res.data?.data || []);
       } catch (e) {
         setError("Failed to load incidents");
@@ -36,10 +37,10 @@ export default function IncidentFeed() {
 
   const reload = async () => {
     const res = isUserReporter
-      ? await axios.get("http://localhost:4567/incidents/my", {
+      ? await axios.get(buildBackendUrl("/incidents/my"), {
           withCredentials: true,
         })
-      : await axios.get("http://localhost:4567/incidents/feed");
+      : await axios.get(buildBackendUrl("/incidents/feed"));
     setItems(res.data?.data || []);
   };
 
@@ -48,7 +49,7 @@ export default function IncidentFeed() {
       if (!isNgo) return;
       try {
         const res = await axios.get(
-          "http://localhost:4567/incidents/ngo/volunteers",
+          buildBackendUrl("/incidents/ngo/volunteers"),
           { withCredentials: true }
         );
         setVolunteers(res.data?.data || []);
@@ -64,7 +65,7 @@ export default function IncidentFeed() {
     setBusyId(incidentId);
     try {
       await axios.post(
-        `http://localhost:4567/incidents/${incidentId}/take`,
+        buildBackendUrl(`/incidents/${incidentId}/take`),
         {},
         { withCredentials: true }
       );
@@ -86,7 +87,7 @@ export default function IncidentFeed() {
         return;
       }
       await axios.post(
-        `http://localhost:4567/incidents/${incidentId}/request-volunteer`,
+        buildBackendUrl(`/incidents/${incidentId}/request-volunteer`),
         { volunteerId },
         { withCredentials: true }
       );

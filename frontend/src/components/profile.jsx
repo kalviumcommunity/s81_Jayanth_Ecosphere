@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 export default function Profile() {
   const [personalDetails, setPersonalDetails] = useState({
@@ -23,7 +24,7 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    fetch("http://localhost:4567/user/checklogin", {
+    fetch(buildBackendUrl("/user/checklogin"), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +54,7 @@ export default function Profile() {
     multiPartFormData.append("photo", file);
     try {
       const response = await axios.post(
-        "http://localhost:4567/user/upload",
+        buildBackendUrl("/user/upload"),
         multiPartFormData,
         {
           headers: {
@@ -118,7 +119,7 @@ export default function Profile() {
               <motion.img
                 src={
                   profilePhoto
-                    ? `http://localhost:4567/profile-photo/${profilePhoto}`
+                    ? buildBackendUrl(`/profile-photo/${profilePhoto}`)
                     : `https://cdn.vectorstock.com/i/500p/17/61/male-avatar-profile-picture-vector-10211761.jpg`
                 }
                 alt="profile"

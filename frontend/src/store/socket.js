@@ -1,6 +1,7 @@
 import { io } from "socket.io-client";
+import { BACKEND_URL } from "../utils/apiConfig";
 
-const socket = io("http://localhost:4567", {
+const socket = io(BACKEND_URL, {
   withCredentials: true,
   autoConnect: false,
   transports: ["websocket"],

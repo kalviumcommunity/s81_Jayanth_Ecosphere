@@ -11,6 +11,7 @@ import {
   FiXCircle,
 } from "react-icons/fi";
 import axios from "axios";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 // Use the socket instance passed from parent (ChatPage) to avoid duplicate connections.
 const ChatSlide = ({ selectedUser, currentUser, socket, onClose }) => {
@@ -74,7 +75,7 @@ const ChatSlide = ({ selectedUser, currentUser, socket, onClose }) => {
     const fetchHistory = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:4567/chat/history/${selectedUser._id}`,
+          buildBackendUrl(`/chat/history/${selectedUser._id}`),
           { withCredentials: true }
         );
         setMessages(res.data.messages || []);
@@ -234,7 +235,7 @@ const ChatSlide = ({ selectedUser, currentUser, socket, onClose }) => {
     form.append("file", file);
     setUploadBusy(true);
     try {
-      const res = await axios.post("http://localhost:4567/chat/upload", form, {
+      const res = await axios.post(buildBackendUrl("/chat/upload"), form, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -329,7 +330,7 @@ const ChatSlide = ({ selectedUser, currentUser, socket, onClose }) => {
       receiver: selectedUser._id,
       messageType,
       message: "",
-      mediaUrl: `http://localhost:4567${uploaded.url}`,
+      mediaUrl: buildBackendUrl(uploaded.url),
       mediaMimeType: uploaded.mimeType,
       mediaOriginalName: uploaded.originalName,
       timestamp: new Date().toISOString(),

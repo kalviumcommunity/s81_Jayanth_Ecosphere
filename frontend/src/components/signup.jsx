@@ -3,6 +3,7 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 function Signup() {
   const [hide, setHide] = useState(true);
@@ -77,7 +78,7 @@ function Signup() {
         ...(role === "volunteer" && { address }),
       };
 
-      await axios.post("http://localhost:4567/user/signup", payload);
+      await axios.post(buildBackendUrl("/user/signup"), payload);
 
       setTimeout(() => {
         navigate("/Login");

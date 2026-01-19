@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 export default function MyDonations() {
   const { user, loading } = useAuth();
@@ -10,7 +11,7 @@ export default function MyDonations() {
   useEffect(() => {
     const run = async () => {
       try {
-        const res = await axios.get("http://localhost:4567/donate/my", {
+        const res = await axios.get(buildBackendUrl("/donate/my"), {
           withCredentials: true,
         });
         setItems(res.data?.data || []);

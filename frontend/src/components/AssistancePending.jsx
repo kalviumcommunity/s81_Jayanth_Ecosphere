@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 export default function AssistancePending() {
   const { user, loading } = useAuth();
@@ -9,7 +10,7 @@ export default function AssistancePending() {
   const [busyId, setBusyId] = useState(null);
 
   const load = async () => {
-    const res = await axios.get("http://localhost:4567/assist/pending", {
+    const res = await axios.get(buildBackendUrl("/assist/pending"), {
       withCredentials: true,
     });
     setItems(res.data?.data || []);
@@ -30,7 +31,7 @@ export default function AssistancePending() {
     setBusyId(id);
     try {
       await axios.post(
-        `http://localhost:4567/assist/requests/${id}/accept`,
+        buildBackendUrl(`/assist/requests/${id}/accept`),
         {},
         { withCredentials: true }
       );
@@ -46,7 +47,7 @@ export default function AssistancePending() {
     setBusyId(id);
     try {
       await axios.patch(
-        `http://localhost:4567/assist/requests/${id}/status`,
+        buildBackendUrl(`/assist/requests/${id}/status`),
         { status },
         { withCredentials: true }
       );

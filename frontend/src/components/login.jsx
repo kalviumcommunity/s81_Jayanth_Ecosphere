@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import GoogleButton from "./Googlebutton";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 function Login() {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ function Login() {
 
     try {
       const response = await axios.post(
-        "http://localhost:4567/user/login",
+        buildBackendUrl("/user/login"),
         { email, password },
         { withCredentials: true }
       );

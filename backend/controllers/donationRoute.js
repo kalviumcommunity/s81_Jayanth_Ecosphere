@@ -1,5 +1,6 @@
 const express = require("express");
-const Stripe = require("stripe");
+const Razorpay = require("razorpay");
+const crypto = require("crypto");
 const catchAsyncError = require("../middleware/catchAsyncError");
 const Errorhandler = require("../utils/Errorhandler");
 const { auth, requireRoles } = require("../middleware/auth");
@@ -17,24 +18,22 @@ const DONATION_ITEMS = {
   water_pack: { itemName: "Clean Water Pack", amountInr: 300 },
 };
 
-function getStripe() {
-  const secret = process.env.STRIPE_SECRET_KEY;
-  if (!secret) return null;
-  return new Stripe(secret, { apiVersion: "2024-06-20" });
+function getRazorpay() {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+  if (!keyId || !keySecret) return null;
+  return new Razorpay({ key_id: keyId, key_secret: keySecret });
 }
 
-function getFrontendBaseUrl() {
-  return process.env.FRONTEND_BASE_URL || "http://localhost:5173";
-}
-
-// Create Stripe checkout session
+// Create Razorpay order
 donationRoute.post(
   "/checkout",
   auth,
   requireRoles("user", "victim", "volunteer", "ngo", "admin"),
   catchAsyncError(async (req, res, next) => {
-    const stripe = getStripe();
-    if (!stripe) return next(new Errorhandler("Stripe is not configured", 500));
+    const razorpay = getRazorpay();
+    if (!razorpay)
+      return next(new Errorhandler("Razorpay is not configured", 500));
 
     const { itemKey, customAmountInr } = req.body;
     if (!itemKey) return next(new Errorhandler("itemKey is required", 400));
@@ -67,68 +66,90 @@ donationRoute.post(
       itemKey,
       itemName,
       amountInr,
-      paymentProvider: "stripe",
+      paymentProvider: "razorpay",
       paymentStatus: "created",
       ngoId: ngo?._id,
     });
 
-    const base = getFrontendBaseUrl();
-
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      customer_email: me.email,
-      line_items: [
-        {
-          price_data: {
-            currency: "inr",
-            product_data: { name: itemName },
-            unit_amount: amountInr * 100,
-          },
-          quantity: 1,
-        },
-      ],
-      metadata: {
+    const order = await razorpay.orders.create({
+      amount: amountInr * 100,
+      currency: "INR",
+      receipt: String(created._id),
+      notes: {
         donationId: String(created._id),
+        itemKey: String(itemKey),
+        itemName: String(itemName),
+        donorEmail: String(me.email),
       },
-      success_url: `${base}/donation-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${base}/donate?canceled=1`,
     });
 
-    created.stripeSessionId = session.id;
+    created.razorpayOrderId = order.id;
     await created.save();
 
-    res.status(200).json({ status: true, url: session.url });
+    res.status(200).json({
+      status: true,
+      razorpay: {
+        keyId: process.env.RAZORPAY_KEY_ID,
+        orderId: order.id,
+        amount: order.amount,
+        currency: order.currency,
+        donationId: String(created._id),
+        itemName,
+        donorName: me.name,
+        donorEmail: me.email,
+      },
+    });
   })
 );
 
-// Confirm endpoint (used by frontend after redirect)
-donationRoute.get(
-  "/confirm",
+// Verify payment signature (called by frontend Razorpay handler)
+donationRoute.post(
+  "/verify",
   auth,
   requireRoles("user", "victim", "volunteer", "ngo", "admin"),
   catchAsyncError(async (req, res, next) => {
-    const stripe = getStripe();
-    if (!stripe) return next(new Errorhandler("Stripe is not configured", 500));
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    if (!keySecret)
+      return next(new Errorhandler("Razorpay is not configured", 500));
 
-    const { session_id } = req.query;
-    if (!session_id)
-      return next(new Errorhandler("session_id is required", 400));
+    const {
+      razorpay_order_id: orderId,
+      razorpay_payment_id: paymentId,
+      razorpay_signature: signature,
+    } = req.body || {};
 
-    const session = await stripe.checkout.sessions.retrieve(String(session_id));
-    const donationId = session?.metadata?.donationId;
-    if (!donationId)
-      return next(new Errorhandler("Donation metadata missing", 400));
+    if (!orderId || !paymentId || !signature)
+      return next(
+        new Errorhandler(
+          "razorpay_order_id, razorpay_payment_id and razorpay_signature are required",
+          400
+        )
+      );
 
-    const donation = await donationModel.findById(donationId);
+    const donation = await donationModel.findOne({ razorpayOrderId: orderId });
     if (!donation) return next(new Errorhandler("Donation not found", 404));
 
+    // Basic ownership check (admins can verify too)
     if (
-      session.payment_status === "paid" &&
-      donation.paymentStatus !== "paid"
+      String(donation.donorId) !== String(req.user_id) &&
+      req.user_role !== "admin"
     ) {
+      return next(new Errorhandler("Not authorized", 403));
+    }
+
+    const expected = crypto
+      .createHmac("sha256", keySecret)
+      .update(`${orderId}|${paymentId}`)
+      .digest("hex");
+
+    if (expected !== signature)
+      return next(new Errorhandler("Invalid payment signature", 400));
+
+    if (donation.paymentStatus !== "paid") {
       donation.paymentStatus = "paid";
-      donation.stripePaymentIntentId = session.payment_intent;
-      donation.transactionId = session.payment_intent;
+      donation.razorpayPaymentId = paymentId;
+      donation.razorpaySignature = signature;
+      donation.transactionId = paymentId;
       await donation.save();
 
       // Send receipt email (best-effort)
@@ -150,7 +171,41 @@ donationRoute.get(
     res.status(200).json({
       status: true,
       data: {
-        payment_status: session.payment_status,
+        payment_status: donation.paymentStatus,
+        donation,
+      },
+    });
+  })
+);
+
+// Confirm endpoint (used by frontend success page)
+donationRoute.get(
+  "/confirm",
+  auth,
+  requireRoles("user", "victim", "volunteer", "ngo", "admin"),
+  catchAsyncError(async (req, res, next) => {
+    const { donation_id, order_id } = req.query;
+
+    if (!donation_id && !order_id)
+      return next(new Errorhandler("donation_id or order_id is required", 400));
+
+    const donation = donation_id
+      ? await donationModel.findById(String(donation_id))
+      : await donationModel.findOne({ razorpayOrderId: String(order_id) });
+
+    if (!donation) return next(new Errorhandler("Donation not found", 404));
+
+    if (
+      String(donation.donorId) !== String(req.user_id) &&
+      req.user_role !== "admin"
+    ) {
+      return next(new Errorhandler("Not authorized", 403));
+    }
+
+    res.status(200).json({
+      status: true,
+      data: {
+        payment_status: donation.paymentStatus,
         donation,
       },
     });

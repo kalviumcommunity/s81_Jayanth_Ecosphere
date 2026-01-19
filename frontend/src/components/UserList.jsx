@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 const UserList = ({ onSelect, onlineUsers }) => {
   const [users, setUsers] = useState([]);
@@ -9,7 +10,7 @@ const UserList = ({ onSelect, onlineUsers }) => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:4567/chat/users", {
+        const res = await axios.get(buildBackendUrl("/chat/users"), {
           withCredentials: true,
         });
         if (res.data?.data) {

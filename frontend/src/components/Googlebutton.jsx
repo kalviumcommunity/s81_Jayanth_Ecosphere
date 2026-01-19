@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ImSpinner2 } from "react-icons/im";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 function GoogleButton() {
   const [loading, setLoading] = useState(false);
@@ -8,7 +9,7 @@ function GoogleButton() {
   const handleGoogleSignIn = () => {
     setLoading(true);
     setTimeout(() => {
-      window.location.href = "http://localhost:4567/user/google";
+      window.location.href = buildBackendUrl("/user/google");
     }, 500);
   };
 

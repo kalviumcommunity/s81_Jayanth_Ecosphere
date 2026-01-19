@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import axios from "axios";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 import donateBanner from "../assets/donate-banner.svg";
 import donateFood from "../assets/donate-food.svg";
@@ -11,28 +12,28 @@ const items = [
   {
     key: "food_kit",
     name: "Food Kit",
-    amount: 100,
+    amount: 500,
     image: donateFood,
     desc: "Basic nutrition packs for families impacted by disasters.",
   },
   {
     key: "medical_kit",
     name: "Medical Aid Kit",
-    amount: 500,
+    amount: 1000,
     image: donateMedical,
     desc: "First-aid supplies and emergency medical support.",
   },
   {
     key: "shelter_kit",
     name: "Emergency Shelter Kit",
-    amount: 1000,
+    amount: 2500,
     image: donateShelter,
     desc: "Temporary shelter essentials for displaced communities.",
   },
   {
     key: "water_pack",
     name: "Clean Water Pack",
-    amount: 50,
+    amount: 300,
     image: donateWater,
     desc: "Safe drinking water support during emergencies.",
   },
@@ -50,6 +51,18 @@ export default function Donate() {
     [selected]
   );
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) return resolve(true);
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const startCheckout = async () => {
     setError("");
     setLoading(true);
@@ -59,19 +72,62 @@ export default function Donate() {
         ...(selected === "custom" ? { customAmountInr: custom } : {}),
       };
 
-      const res = await axios.post(
-        "http://localhost:4567/donate/checkout",
-        body,
-        {
-          withCredentials: true,
-        }
-      );
+      const res = await axios.post(buildBackendUrl("/donate/checkout"), body, {
+        withCredentials: true,
+      });
 
-      if (res.data?.url) {
-        window.location.href = res.data.url;
+      const rp = res.data?.razorpay;
+      if (!rp?.keyId || !rp?.orderId) {
+        setError("Failed to start payment");
         return;
       }
-      setError("Failed to start payment");
+
+      const ok = await loadRazorpayScript();
+      if (!ok) {
+        setError("Failed to load Razorpay checkout");
+        return;
+      }
+
+      const options = {
+        key: rp.keyId,
+        amount: rp.amount,
+        currency: rp.currency || "INR",
+        name: "EcoSphere",
+        description: rp.itemName || "Donation",
+        order_id: rp.orderId,
+        prefill: {
+          name: rp.donorName || "",
+          email: rp.donorEmail || "",
+        },
+        notes: {
+          donationId: rp.donationId,
+          itemName: rp.itemName,
+        },
+        handler: async (response) => {
+          try {
+            await axios.post(buildBackendUrl("/donate/verify"), response, {
+              withCredentials: true,
+            });
+            window.location.href = `/donation-success?donation_id=${encodeURIComponent(
+              rp.donationId
+            )}`;
+          } catch (e) {
+            setError(
+              e?.response?.data?.message || "Payment verification failed"
+            );
+          }
+        },
+        modal: {
+          ondismiss: () => setError("Payment cancelled"),
+        },
+        theme: { color: "#4f46e5" },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", (resp) => {
+        setError(resp?.error?.description || "Payment failed");
+      });
+      rzp.open();
     } catch (e) {
       setError(e?.response?.data?.message || "Payment failed");
     } finally {

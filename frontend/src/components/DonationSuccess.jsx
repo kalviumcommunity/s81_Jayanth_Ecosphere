@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 export default function DonationSuccess() {
   const [status, setStatus] = useState("loading");
@@ -11,18 +12,18 @@ export default function DonationSuccess() {
   useEffect(() => {
     const run = async () => {
       const sp = new URLSearchParams(window.location.search);
-      const sessionId = sp.get("session_id");
-      if (!sessionId) {
+      const donationId = sp.get("donation_id");
+      if (!donationId) {
         setStatus("error");
-        setError("Missing session_id");
+        setError("Missing donation_id");
         return;
       }
 
       try {
         const res = await axios.get(
-          `http://localhost:4567/donate/confirm?session_id=${encodeURIComponent(
-            sessionId
-          )}`,
+          buildBackendUrl(
+            `/donate/confirm?donation_id=${encodeURIComponent(donationId)}`
+          ),
           { withCredentials: true }
         );
         setDetails(res.data?.data);

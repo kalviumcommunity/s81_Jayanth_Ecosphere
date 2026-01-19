@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { buildBackendUrl } from "../utils/apiConfig";
 
 const VolunteerList = ({ onSelect, onlineUsers }) => {
   const [volunteers, setVolunteers] = useState([]);
@@ -8,7 +9,7 @@ const VolunteerList = ({ onSelect, onlineUsers }) => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:4567/chat/all", { withCredentials: true })
+      .get(buildBackendUrl("/chat/all"), { withCredentials: true })
       .then((res) => {
         setVolunteers(res.data.data || []);
         setLoading(false);
