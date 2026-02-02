@@ -298,7 +298,7 @@ const Data = () => {
 
       <footer className="bg-gray-800 text-white p-6 mt-8">
         <div className="text-center">
-          <p>&copy; 2025 EcoSphere. All rights reserved.</p>
+          <p>&copy; 2026 EcoSphere. All rights reserved.</p>
           <div className="mt-2">
             <a href="#" className="text-blue-400 hover:underline mr-4">
               About Us

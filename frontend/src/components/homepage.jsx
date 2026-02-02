@@ -444,7 +444,7 @@ function Homepage() {
 
       <footer className="mt-12">
         <div className="text-center text-sm text-gray-500">
-          <p>&copy; 2025 EcoSphere. All rights reserved.</p>
+          <p>&copy; 2026 EcoSphere. All rights reserved.</p>
           <div className="mt-2">
             <a href="#" className="text-indigo-600 hover:underline mr-4">
               About Us
