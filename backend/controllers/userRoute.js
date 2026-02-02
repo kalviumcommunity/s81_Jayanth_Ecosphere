@@ -20,7 +20,9 @@ require("dotenv").config();
 const userRoute = express.Router();
 
 function getFrontendBaseUrl() {
-  return process.env.FRONTEND_BASE_URL || "http://localhost:5173";
+  const rawBase = process.env.FRONTEND_BASE_URL || "http://localhost:5173";
+  // Ensure there is no trailing slash to avoid paths like `//google-success`
+  return rawBase.replace(/\/+$/, "");
 }
 
 function getAuthCookieOptions() {
