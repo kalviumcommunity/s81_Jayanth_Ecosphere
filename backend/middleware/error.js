@@ -1,6 +1,6 @@
 // const Errorhandler=require("../utils/Errorhandler")
 
-module.exports=(err,req,res,next)=>{
+module.exports = (err, req, res, next) => {
   // Log server-side for debugging (avoid leaking secrets to client)
   try {
     console.error("[API ERROR]", {
@@ -12,12 +12,12 @@ module.exports=(err,req,res,next)=>{
     });
   } catch (_) {}
 
-  err.statusCode=err.statusCode ||500
-  err.message=
-    err?.error?.description || err.message || "internal server error"
+  err.statusCode = err.statusCode || 500;
+  err.message =
+    err?.error?.description || err.message || "internal server error";
 
   res.status(err.statusCode).json({
-    success:false,
-    message:err.message
-  })
-}
+    success: false,
+    message: err.message,
+  });
+};

@@ -40,7 +40,7 @@ const donationSchema = new mongoose.Schema(
 
     ngoId: { type: mongoose.Schema.Types.ObjectId, ref: "volunteer" },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const donationModel = mongoose.model("donation", donationSchema);

@@ -41,7 +41,7 @@ userRoute.post(
 
     if (!name || !email || !password) {
       return next(
-        new Errorhandler("Name, email and password required ❌", 400)
+        new Errorhandler("Name, email and password required ❌", 400),
       );
     }
 
@@ -102,7 +102,7 @@ userRoute.post(
     res
       .status(201)
       .json({ status: true, message: "Registration successful 👍" });
-  })
+  }),
 );
 
 userRoute.get(
@@ -123,7 +123,7 @@ userRoute.get(
         message: "Account activated successfully. You can now log in.",
       });
     });
-  })
+  }),
 );
 
 userRoute.post(
@@ -142,7 +142,7 @@ userRoute.post(
 
     if (!user.isActivated) {
       return next(
-        new Errorhandler("Please activate your account first 🥺", 403)
+        new Errorhandler("Please activate your account first 🥺", 403),
       );
     }
 
@@ -154,7 +154,7 @@ userRoute.post(
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: "24h" },
     );
 
     res.cookie("accesstoken", token, {
@@ -164,7 +164,7 @@ userRoute.post(
     res
       .status(200)
       .json({ status: true, message: "Login successful 👍", token });
-  })
+  }),
 );
 
 userRoute.get(
@@ -179,7 +179,7 @@ userRoute.get(
       .findById(userId)
       .select("name email role address profilePhoto ngoVerified ngoRequest");
     res.status(200).json({ status: true, message: user });
-  })
+  }),
 );
 
 userRoute.put(
@@ -197,11 +197,11 @@ userRoute.put(
     const updatedUser = await volunteerModel.findByIdAndUpdate(
       userId,
       { $push: { address: req.body } },
-      { new: true }
+      { new: true },
     );
 
     res.status(200).json({ status: true, message: updatedUser });
-  })
+  }),
 );
 
 userRoute.post(
@@ -222,10 +222,10 @@ userRoute.post(
     let updated = await volunteerModel.findByIdAndUpdate(
       userId,
       { profilePhoto: fileName },
-      { new: true }
+      { new: true },
     );
     res.status(200).json({ message: updated });
-  })
+  }),
 );
 
 userRoute.get(
@@ -239,7 +239,7 @@ userRoute.get(
       status: true,
       message: "Logout successful 👋",
     });
-  })
+  }),
 );
 
 const googleAuthCallback = async (req, res) => {
@@ -271,7 +271,7 @@ const googleAuthCallback = async (req, res) => {
     const token = jwt.sign(
       { id: existingUser._id, role: existingUser.role },
       process.env.SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: "24h" },
     );
 
     res.cookie("accesstoken", token, {
@@ -290,7 +290,7 @@ const googleAuthCallback = async (req, res) => {
 
 userRoute.get(
   "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+  passport.authenticate("google", { scope: ["profile", "email"] }),
 );
 
 userRoute.get(
@@ -304,7 +304,7 @@ userRoute.get(
     console.log("User object:", req.user);
     next();
   },
-  googleAuthCallback
+  googleAuthCallback,
 );
 
 module.exports = { userRoute };

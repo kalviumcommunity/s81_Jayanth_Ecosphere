@@ -48,7 +48,7 @@ export default function Donate() {
 
   const selectedItem = useMemo(
     () => items.find((i) => i.key === selected),
-    [selected]
+    [selected],
   );
 
   const loadRazorpayScript = () => {
@@ -109,11 +109,11 @@ export default function Donate() {
               withCredentials: true,
             });
             window.location.href = `/donation-success?donation_id=${encodeURIComponent(
-              rp.donationId
+              rp.donationId,
             )}`;
           } catch (e) {
             setError(
-              e?.response?.data?.message || "Payment verification failed"
+              e?.response?.data?.message || "Payment verification failed",
             );
           }
         },

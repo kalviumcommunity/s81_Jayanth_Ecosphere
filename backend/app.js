@@ -23,7 +23,7 @@ app.use(passport.initialize());
 const allowedOrigins = String(
   process.env.CORS_ORIGIN ||
     process.env.FRONTEND_BASE_URL ||
-    "http://localhost:5173"
+    "http://localhost:5173",
 )
   .split(",")
   .map((s) => s.trim())
@@ -45,7 +45,7 @@ app.use(
       "Accept",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  })
+  }),
 );
 app.use(cookieparser());
 

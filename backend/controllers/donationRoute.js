@@ -33,7 +33,9 @@ donationRoute.post(
   requireRoles("user", "victim", "volunteer", "ngo", "admin"),
   catchAsyncError(async (req, res, next) => {
     if (!mongoose.Types.ObjectId.isValid(String(req.user_id))) {
-      return next(new Errorhandler("Invalid session. Please login again.", 401));
+      return next(
+        new Errorhandler("Invalid session. Please login again.", 401),
+      );
     }
 
     const razorpay = getRazorpay();
@@ -111,7 +113,7 @@ donationRoute.post(
         donorEmail: me.email,
       },
     });
-  })
+  }),
 );
 
 // Verify payment signature (called by frontend Razorpay handler)
@@ -121,7 +123,9 @@ donationRoute.post(
   requireRoles("user", "victim", "volunteer", "ngo", "admin"),
   catchAsyncError(async (req, res, next) => {
     if (!mongoose.Types.ObjectId.isValid(String(req.user_id))) {
-      return next(new Errorhandler("Invalid session. Please login again.", 401));
+      return next(
+        new Errorhandler("Invalid session. Please login again.", 401),
+      );
     }
 
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -138,8 +142,8 @@ donationRoute.post(
       return next(
         new Errorhandler(
           "razorpay_order_id, razorpay_payment_id and razorpay_signature are required",
-          400
-        )
+          400,
+        ),
       );
 
     const donation = await donationModel.findOne({ razorpayOrderId: orderId });
@@ -191,7 +195,7 @@ donationRoute.post(
         donation,
       },
     });
-  })
+  }),
 );
 
 // Confirm endpoint (used by frontend success page)
@@ -201,7 +205,9 @@ donationRoute.get(
   requireRoles("user", "victim", "volunteer", "ngo", "admin"),
   catchAsyncError(async (req, res, next) => {
     if (!mongoose.Types.ObjectId.isValid(String(req.user_id))) {
-      return next(new Errorhandler("Invalid session. Please login again.", 401));
+      return next(
+        new Errorhandler("Invalid session. Please login again.", 401),
+      );
     }
 
     const { donation_id, order_id } = req.query;
@@ -229,7 +235,7 @@ donationRoute.get(
         donation,
       },
     });
-  })
+  }),
 );
 
 // Donor: view own donations
@@ -242,7 +248,7 @@ donationRoute.get(
       .find({ donorId: req.user_id })
       .sort({ createdAt: -1 });
     res.status(200).json({ status: true, data: items });
-  })
+  }),
 );
 
 // NGO: view assigned donations
@@ -255,7 +261,7 @@ donationRoute.get(
       .find({ ngoId: req.user_id, paymentStatus: "paid" })
       .sort({ createdAt: -1 });
     res.status(200).json({ status: true, data: items });
-  })
+  }),
 );
 
 // Admin: view all donations
@@ -266,7 +272,7 @@ donationRoute.get(
   catchAsyncError(async (req, res) => {
     const items = await donationModel.find({}).sort({ createdAt: -1 });
     res.status(200).json({ status: true, data: items });
-  })
+  }),
 );
 
 module.exports = { donationRoute };

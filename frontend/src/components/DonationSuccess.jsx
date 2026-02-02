@@ -22,9 +22,9 @@ export default function DonationSuccess() {
       try {
         const res = await axios.get(
           buildBackendUrl(
-            `/donate/confirm?donation_id=${encodeURIComponent(donationId)}`
+            `/donate/confirm?donation_id=${encodeURIComponent(donationId)}`,
           ),
-          { withCredentials: true }
+          { withCredentials: true },
         );
         setDetails(res.data?.data);
         setStatus("ok");
