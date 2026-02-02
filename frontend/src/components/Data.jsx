@@ -9,9 +9,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { motion } from "framer-motion";
+import useAuth from "../hooks/useAuth";
 
 const Data = () => {
-  const [darkMode, setDarkMode] = useState(false);
   const [metrics, setMetrics] = useState({
     airQuality: 0,
     waterQuality: 0,
@@ -22,16 +22,13 @@ const Data = () => {
   const [history, setHistory] = useState([]);
   const [timeRange, setTimeRange] = useState("day");
   const [tipIndex, setTipIndex] = useState(Math.floor(Math.random() * 3));
+  const { user } = useAuth();
 
   const tips = [
     "Tip: Turn off the tap while brushing your teeth. Saves 6L/min!",
     "Tip: Switch to LED lights to save energy.",
     "Tip: Use public transport to reduce emissions.",
   ];
-
-  const toggleDarkMode = () => {
-    setDarkMode((prev) => !prev);
-  };
 
   const generateMetricsData = (range) => {
     setLoading(true);
@@ -104,16 +101,12 @@ const Data = () => {
     setTimeRange(e.target.value);
   };
 
-  const cardBase = `${
-    darkMode ? "bg-neutral-800 text-white" : "bg-white text-gray-900"
-  } p-6 rounded-lg shadow-lg`;
-
   const aqiColorClass = (aqi) =>
     aqi < 50
       ? "text-green-500"
       : aqi < 100
-      ? "text-yellow-400"
-      : "text-red-500";
+        ? "text-yellow-400"
+        : "text-red-500";
 
   const greeting = () => {
     const hour = new Date().getHours();
@@ -129,189 +122,209 @@ const Data = () => {
   };
 
   return (
-    <div
-      className={
-        darkMode
-          ? "min-h-screen bg-gray-900 text-white"
-          : "min-h-screen bg-gray-50 text-gray-900"
-      }
-    >
-      <header className="flex justify-between items-center p-6">
-        <h1 className="text-2xl font-extrabold">Welcome to EcoSphere</h1>
-        <motion.button
-          onClick={toggleDarkMode}
-          aria-label="Toggle dark mode"
-          className="p-2 rounded-full"
-          whileTap={{ rotate: 360 }}
-        >
-          {darkMode ? "🌙" : "☀"}
-        </motion.button>
-      </header>
-
-      <section className="p-6">
-        <h2 className="text-xl font-medium mb-2">{greeting()}, Jayanth! 🌿</h2>
-        <p className="mb-4 italic text-sm text-green-600">{tips[tipIndex]}</p>
-        {loading ? (
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
-            <p className="text-gray-600">Loading metrics...</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className={`glass-card ${
-                darkMode
-                  ? "bg-neutral-800 text-white"
-                  : "bg-white text-gray-900"
-              } p-6 rounded-lg`}
-            >
-              <h3 className="text-xl font-semibold">Air Quality</h3>
-              <p className="text-sm mt-1">
-                Status:{" "}
-                <span className="font-semibold">
-                  {statusLabel(metrics.airQuality)}
-                </span>
+    <div className="min-h-screen page-wrap py-10 sm:py-14 px-4">
+      <div className="max-w-6xl mx-auto space-y-8">
+        <section className="glass-card p-6 sm:p-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+              <div className="text-xs sm:text-sm font-semibold text-indigo-700 tracking-wide">
+                Environment overview
+              </div>
+              <h1 className="mt-2 text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 leading-tight">
+                {greeting()}
+                {user?.name ? `, ${user.name}` : ""} 🌿
+              </h1>
+              <p className="mt-2 text-sm sm:text-base text-gray-600 max-w-xl">
+                A quick snapshot of air, water, waste and energy indicators to
+                help you understand local environmental conditions.
               </p>
-              <div
-                className={`mt-2 text-center text-4xl font-bold ${aqiColorClass(
-                  metrics.airQuality
-                )}`}
+              <p className="mt-3 text-xs sm:text-sm text-emerald-600 italic">
+                {tips[tipIndex]}
+              </p>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="mt-8 flex flex-col items-center gap-3">
+              <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+              <p className="text-gray-600 text-sm">Loading metrics...</p>
+            </div>
+          ) : (
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glass-card p-5 rounded-2xl"
               >
-                {metrics.airQuality} AQI
-              </div>
-            </motion.div>
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                  Air Quality
+                </h3>
+                <p className="text-xs text-gray-500 mt-1">
+                  Real-time AQI status
+                </p>
+                <div
+                  className={`mt-4 text-3xl font-extrabold text-center ${aqiColorClass(
+                    metrics.airQuality,
+                  )}`}
+                >
+                  {metrics.airQuality} AQI
+                </div>
+                <p className="mt-2 text-xs text-center text-gray-600">
+                  Status:{" "}
+                  <span className="font-semibold">
+                    {statusLabel(metrics.airQuality)}
+                  </span>
+                </p>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className={`glass-card ${
-                darkMode
-                  ? "bg-neutral-800 text-white"
-                  : "bg-white text-gray-900"
-              } p-6 rounded-lg`}
-            >
-              <h3 className="text-xl font-semibold">Water Quality</h3>
-              <div className="mt-2 text-center text-4xl font-bold text-sky-500">
-                {metrics.waterQuality}%
-              </div>
-            </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 }}
+                className="glass-card p-5 rounded-2xl"
+              >
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                  Water Quality
+                </h3>
+                <p className="text-xs text-gray-500 mt-1">
+                  Drinking & usage safety
+                </p>
+                <div className="mt-4 text-3xl font-extrabold text-center text-sky-500">
+                  {metrics.waterQuality}%
+                </div>
+                <p className="mt-2 text-xs text-center text-gray-600">
+                  Higher is better
+                </p>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className={`glass-card ${
-                darkMode
-                  ? "bg-neutral-800 text-white"
-                  : "bg-white text-gray-900"
-              } p-6 rounded-lg`}
-            >
-              <h3 className="text-xl font-semibold">Waste Levels</h3>
-              <div className="mt-2 text-center text-4xl font-bold text-gray-700">
-                {metrics.wasteLevels}
-              </div>
-            </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="glass-card p-5 rounded-2xl"
+              >
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                  Waste Levels
+                </h3>
+                <p className="text-xs text-gray-500 mt-1">
+                  Local waste pressure
+                </p>
+                <div className="mt-4 text-2xl font-extrabold text-center text-amber-500">
+                  {metrics.wasteLevels}
+                </div>
+                <p className="mt-2 text-xs text-center text-gray-600">
+                  Try to keep this low
+                </p>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className={`glass-card ${
-                darkMode
-                  ? "bg-neutral-800 text-white"
-                  : "bg-white text-gray-900"
-              } p-6 rounded-lg`}
-            >
-              <h3 className="text-xl font-semibold">Energy Usage</h3>
-              <div className="mt-2 text-center text-4xl font-bold text-emerald-400">
-                {metrics.energyUsage}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </section>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                className="glass-card p-5 rounded-2xl"
+              >
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                  Energy Usage
+                </h3>
+                <p className="text-xs text-gray-500 mt-1">
+                  Approximate daily use
+                </p>
+                <div className="mt-4 text-3xl font-extrabold text-center text-emerald-500">
+                  {metrics.energyUsage}
+                </div>
+                <p className="mt-2 text-xs text-center text-gray-600">
+                  Small savings here have big impact
+                </p>
+              </motion.div>
+            </div>
+          )}
+        </section>
 
-      <section className="p-6">
-        <h2 className="text-xl font-semibold mb-4">Air Quality Trend</h2>
-        <select
-          onChange={handleTimeRangeChange}
-          value={timeRange}
-          className={`${cardBase} mb-4 p-2 bg-gray-200 rounded`}
-        >
-          <option value="day">Day</option>
-          <option value="week">Week</option>
-          <option value="month">Month</option>
-          <option value="year">Year</option>
-        </select>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={history}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Line
-              type="monotone"
-              dataKey="AQI"
-              stroke="#8884d8"
-              activeDot={{ r: 8 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </section>
-
-      <section className="p-6">
-        <h2 className="text-xl font-semibold mb-4">Action Center</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {["🌱", "⚠", "💧", "♻"].map((icon, index) => (
-            <motion.div
-              key={index}
-              initial={{ scale: 0.95, opacity: 0 }}
-              whileInView={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.3 }}
-              className={`${cardBase} p-8 rounded-lg shadow-lg`}
-            >
-              <div className="text-3xl mb-4">{icon}</div>
-              <h3 className="text-2xl font-semibold mb-4">
-                {
-                  [
-                    "Plant a Tree",
-                    "Disaster Tips",
-                    "Water Saving Tips",
-                    "Eco-Friendly Lifestyle",
-                  ][index]
-                }
-              </h3>
-              <p>
-                {
-                  [
-                    "Understand the benefits of planting a tree and learn the best practices for growing one.",
-                    "Get prepared for emergencies with expert advice on how to protect yourself and your loved ones.",
-                    "Explore practical and sustainable ways to conserve water in your daily life.",
-                    "Learn how to reduce your carbon footprint and live more sustainably through easy lifestyle changes.",
-                  ][index]
-                }
+        <section className="glass-card p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+            <div>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+                Air quality trend
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                Visualize how AQI changes over your selected time range.
               </p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      <footer className="bg-gray-800 text-white p-6 mt-8">
-        <div className="text-center">
-          <p>&copy; 2026 EcoSphere. All rights reserved.</p>
-          <div className="mt-2">
-            <a href="#" className="text-blue-400 hover:underline mr-4">
-              About Us
-            </a>
-            <a href="#" className="text-blue-400 hover:underline mr-4">
-              Contact
-            </a>
-            <a href="#" className="text-blue-400 hover:underline">
-              Privacy Policy
-            </a>
+            </div>
+            <select
+              onChange={handleTimeRangeChange}
+              value={timeRange}
+              className="glass-card px-3 py-1.5 text-xs sm:text-sm rounded-xl border border-gray-200 bg-white/70"
+            >
+              <option value="day">Last 24 hours</option>
+              <option value="week">Last 7 days</option>
+              <option value="month">Last 30 days</option>
+              <option value="year">Last 12 months</option>
+            </select>
           </div>
-        </div>
-      </footer>
+
+          <div className="h-72 sm:h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={history}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10 }} />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="AQI"
+                  stroke="#4f46e5"
+                  strokeWidth={2}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+
+        <section className="glass-card p-6 sm:p-8">
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+              Action center
+            </h2>
+            <p className="hidden sm:block text-xs text-gray-500">
+              Simple everyday actions that support a healthier planet.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {["🌱", "⚠", "💧", "♻"].map((icon, index) => (
+              <motion.div
+                key={index}
+                initial={{ scale: 0.96, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.25 }}
+                className="glass-card p-5 rounded-2xl"
+              >
+                <div className="text-3xl mb-3">{icon}</div>
+                <h3 className="text-lg font-semibold mb-2">
+                  {
+                    [
+                      "Plant a tree",
+                      "Disaster tips",
+                      "Water saving",
+                      "Eco lifestyle",
+                    ][index]
+                  }
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {
+                    [
+                      "Understand the benefits of planting trees and learn the best practices for growing one.",
+                      "Be ready for emergencies with simple steps that protect you and your community.",
+                      "Explore practical and sustainable ways to conserve water every day.",
+                      "Learn how small changes in daily habits can reduce your footprint.",
+                    ][index]
+                  }
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      </div>
     </div>
   );
 };
