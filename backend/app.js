@@ -26,7 +26,7 @@ const allowedOrigins = String(
     "http://localhost:5173",
 )
   .split(",")
-  .map((s) => s.trim().replace(/\/+$/, ""))
+  .map((s) => s.trim())
   .filter(Boolean);
 
 app.use(
@@ -34,8 +34,7 @@ app.use(
     origin: (origin, cb) => {
       // Allow non-browser clients (no Origin header)
       if (!origin) return cb(null, true);
-      const normalizedOrigin = origin.replace(/\/+$/, "");
-      if (allowedOrigins.includes(normalizedOrigin)) return cb(null, true);
+      if (allowedOrigins.includes(origin)) return cb(null, true);
       return cb(new Error(`CORS blocked for origin: ${origin}`));
     },
     credentials: true,
